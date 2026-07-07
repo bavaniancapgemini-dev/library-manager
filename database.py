@@ -155,7 +155,6 @@ def create_member_table():
 
     conn.close()
     
-create_member_table()
 
 def add_member(name, phone):
 
@@ -239,7 +238,7 @@ def total_members():
 
     return count
 
-def borrow_book(title, member):
+def borrow_book(title, member, borrow_date, due_date):
 
     import sqlite3
 
@@ -248,29 +247,37 @@ def borrow_book(title, member):
     cursor = conn.cursor()
 
     cursor.execute(
-
         """
-
         UPDATE books
-
         SET status=?,
-
-        borrowed_by=?
-
+            borrowed_by=?
         WHERE title=?
-
         """,
-
         (
-
             "Borrowed",
-
             member,
-
             title
-
         )
+    )
 
+    cursor.execute(
+        """
+        INSERT INTO transactions(
+            book_title,
+            member_name,
+            borrow_date,
+            due_date,
+            return_date
+        )
+        VALUES(?,?,?,?,?)
+        """,
+        (
+            title,
+            member,
+            borrow_date,
+            due_date,
+            ""
+        )
     )
 
     conn.commit()
@@ -281,36 +288,157 @@ def return_book(title):
 
     import sqlite3
 
+    from datetime import datetime
+
     conn = sqlite3.connect("library.db")
 
     cursor = conn.cursor()
 
     cursor.execute(
-
         """
-
         UPDATE books
-
         SET status=?,
-
-        borrowed_by=?
-
+            borrowed_by=?
         WHERE title=?
-
         """,
-
         (
-
             "Available",
-
             "",
-
             title
-
         )
+    )
 
+    cursor.execute(
+        """
+        UPDATE transactions
+        SET return_date=?
+        WHERE book_title=? AND return_date=''
+        """,
+        (
+            datetime.now().strftime("%Y-%m-%d"),
+            title
+        )
     )
 
     conn.commit()
 
     conn.close()
+    
+def create_transaction_table():
+
+    import sqlite3
+
+    conn = sqlite3.connect("library.db")
+
+    cursor = conn.cursor()
+
+    cursor.execute("""
+
+    CREATE TABLE IF NOT EXISTS transactions(
+
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+
+        book_title TEXT,
+
+        member_name TEXT,
+
+        borrow_date TEXT,
+
+        due_date TEXT,
+
+        return_date TEXT
+
+    )
+
+    """)
+
+    conn.commit()
+
+    conn.close()
+    
+def return_book(title):
+
+    import sqlite3
+
+    from datetime import datetime
+
+    conn = sqlite3.connect("library.db")
+
+    cursor = conn.cursor()
+
+    cursor.execute(
+        """
+        UPDATE books
+        SET status=?,
+            borrowed_by=?
+        WHERE title=?
+        """,
+        (
+            "Available",
+            "",
+            title
+        )
+    )
+
+    cursor.execute(
+        """
+        UPDATE transactions
+        SET return_date=?
+        WHERE book_title=? AND return_date=''
+        """,
+        (
+            datetime.now().strftime("%Y-%m-%d"),
+            title
+        )
+    )
+
+    conn.commit()
+
+    conn.close()
+    
+def view_transactions(): 
+    
+    import sqlite3 
+    
+    conn = sqlite3.connect("library.db") 
+    
+    cursor = conn.cursor() 
+    
+    cursor.execute( "SELECT * FROM transactions" ) 
+    
+    data = cursor.fetchall() 
+    
+    conn.close() 
+    
+    return data
+    
+def overdue_books():
+
+    import sqlite3
+
+    from datetime import datetime
+
+    conn = sqlite3.connect("library.db")
+
+    cursor = conn.cursor()
+
+    today = datetime.now().strftime("%Y-%m-%d")
+
+    cursor.execute(
+        """
+        SELECT *
+        FROM transactions
+        WHERE due_date<?
+        AND return_date=''
+        """,
+        (today,)
+    )
+
+    data = cursor.fetchall()
+
+    conn.close()
+
+    return data
+
+create_member_table()
+create_transaction_table()

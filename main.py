@@ -10,7 +10,9 @@ from database import (
     borrow_book,
     return_book,
     search_member,
-    total_members
+    total_members,
+    view_transactions,
+    overdue_books
 )
 
 from search import search_book
@@ -36,7 +38,9 @@ while True:
     print("12. Return Book")
     print("13. Search Member")
     print("14. Total Members")
-    print("15. Exit")
+    print("15. Borrow History")
+    print("16. Overdue Books")
+    print("17. Exit")
 
     choice = input("Choose: ")
 
@@ -180,15 +184,24 @@ while True:
 
         title_name = input("Book Title: ")
 
+        from datetime import datetime, timedelta
+
         member = input("Member Name: ")
 
+        borrow_date = datetime.now().strftime("%Y-%m-%d")
+
+        due_date = (datetime.now() + timedelta(days=14)).strftime("%Y-%m-%d")
+
         borrow_book(
-
             title_name,
-
-            member
-
+            member,
+            borrow_date,
+            due_date
         )
+
+        print("Book Borrowed")
+
+        print("Due Date:", due_date)
 
         print("Book Borrowed")
         
@@ -219,8 +232,28 @@ while True:
             total_members()
 
         )
-
+        
     elif choice == "15":
+        
+        history = view_transactions()
+        
+        print("\n===== BORROW HISTORY =====\n")
+        
+        for item in history:
+            
+            print(item)
+            
+    elif choice == "16":
+        
+        books = overdue_books()
+        
+        print("\n===== OVERDUE BOOKS =====\n")
+        
+        for book in books:
+            
+            print(book)
+
+    elif choice == "17":
 
         break
 
