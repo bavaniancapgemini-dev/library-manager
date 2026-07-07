@@ -6,9 +6,13 @@ connection = sqlite3.connect("library.db")
 cursor = connection.cursor()
 
 cursor.execute("""
-CREATE TABLE IF NOT EXISTS books (
-    title TEXT,
-    author TEXT
+CREATE TABLE IF NOT EXISTS books(
+id INTEGER PRIMARY KEY AUTOINCREMENT,
+title TEXT,
+author TEXT,
+category TEXT,
+status TEXT,
+borrowed_by TEXT
 )
 """)
 
@@ -16,20 +20,25 @@ connection.commit()
 
 connection.close()
 
-def add_book(title, author):
+def add_book(title, author, category):
 
-    connection = sqlite3.connect("library.db")
+    import sqlite3
 
-    cursor = connection.cursor()
+    conn = sqlite3.connect("library.db")
+
+    cursor = conn.cursor()
 
     cursor.execute(
-        "INSERT INTO books VALUES (?, ?)",
-        (title, author)
+
+        "INSERT INTO books(title,author,category,status) VALUES(?,?,?,?)",
+
+        (title, author, category, "Available")
+
     )
 
-    connection.commit()
+    conn.commit()
 
-    connection.close()
+    conn.close()
 
 def view_books():
 
@@ -59,3 +68,249 @@ def delete_book(title):
     connection.commit()
 
     connection.close()
+    
+def available_books():
+
+    import sqlite3
+
+    conn = sqlite3.connect("library.db")
+
+    cursor = conn.cursor()
+
+    cursor.execute(
+
+        "SELECT * FROM books WHERE status='Available'"
+
+    )
+
+    books = cursor.fetchall()
+
+    conn.close()
+
+    return books
+
+def borrowed_books():
+
+    import sqlite3
+
+    conn = sqlite3.connect("library.db")
+
+    cursor = conn.cursor()
+
+    cursor.execute(
+
+        "SELECT * FROM books WHERE status='Borrowed'"
+
+    )
+
+    books = cursor.fetchall()
+
+    conn.close()
+
+    return books
+
+def update_status(title, status):
+
+    import sqlite3
+
+    conn = sqlite3.connect("library.db")
+
+    cursor = conn.cursor()
+
+    cursor.execute(
+
+        "UPDATE books SET status=? WHERE title=?",
+
+        (status, title)
+
+    )
+
+    conn.commit()
+
+    conn.close()
+    
+def create_member_table():
+
+    import sqlite3
+
+    conn = sqlite3.connect("library.db")
+
+    cursor = conn.cursor()
+
+    cursor.execute("""
+
+    CREATE TABLE IF NOT EXISTS members(
+
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+
+    name TEXT,
+
+    phone TEXT
+
+    )
+
+    """)
+
+    conn.commit()
+
+    conn.close()
+    
+create_member_table()
+
+def add_member(name, phone):
+
+    import sqlite3
+
+    conn = sqlite3.connect("library.db")
+
+    cursor = conn.cursor()
+
+    cursor.execute(
+
+        "INSERT INTO members(name,phone) VALUES(?,?)",
+
+        (name, phone)
+
+    )
+
+    conn.commit()
+
+    conn.close()
+    
+def view_members():
+
+    import sqlite3
+
+    conn = sqlite3.connect("library.db")
+
+    cursor = conn.cursor()
+
+    cursor.execute(
+
+        "SELECT * FROM members"
+
+    )
+
+    members = cursor.fetchall()
+
+    conn.close()
+
+    return members
+
+def search_member(keyword):
+
+    import sqlite3
+
+    conn = sqlite3.connect("library.db")
+
+    cursor = conn.cursor()
+
+    cursor.execute(
+
+        "SELECT * FROM members WHERE name LIKE ?",
+
+        ("%"+keyword+"%",)
+
+    )
+
+    data = cursor.fetchall()
+
+    conn.close()
+
+    return data
+
+def total_members():
+
+    import sqlite3
+
+    conn = sqlite3.connect("library.db")
+
+    cursor = conn.cursor()
+
+    cursor.execute(
+
+        "SELECT COUNT(*) FROM members"
+
+    )
+
+    count = cursor.fetchone()[0]
+
+    conn.close()
+
+    return count
+
+def borrow_book(title, member):
+
+    import sqlite3
+
+    conn = sqlite3.connect("library.db")
+
+    cursor = conn.cursor()
+
+    cursor.execute(
+
+        """
+
+        UPDATE books
+
+        SET status=?,
+
+        borrowed_by=?
+
+        WHERE title=?
+
+        """,
+
+        (
+
+            "Borrowed",
+
+            member,
+
+            title
+
+        )
+
+    )
+
+    conn.commit()
+
+    conn.close()
+    
+def return_book(title):
+
+    import sqlite3
+
+    conn = sqlite3.connect("library.db")
+
+    cursor = conn.cursor()
+
+    cursor.execute(
+
+        """
+
+        UPDATE books
+
+        SET status=?,
+
+        borrowed_by=?
+
+        WHERE title=?
+
+        """,
+
+        (
+
+            "Available",
+
+            "",
+
+            title
+
+        )
+
+    )
+
+    conn.commit()
+
+    conn.close()

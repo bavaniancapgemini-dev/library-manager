@@ -1,7 +1,16 @@
 from database import (
     add_book,
     view_books,
-    delete_book
+    delete_book,
+    available_books,
+    borrowed_books,
+    update_status,
+    add_member,
+    view_members,
+    borrow_book,
+    return_book,
+    search_member,
+    total_members
 )
 
 from search import search_book
@@ -18,7 +27,16 @@ while True:
     print("3. Search Book")
     print("4. Delete Book")
     print("5. Total Books")
-    print("6. Exit")
+    print("6. View Available Books")
+    print("7. View Borrowed Books")
+    print("8. Update Book Status")
+    print("9. Add Member")
+    print("10. View Members")
+    print("11. Borrow Book")
+    print("12. Return Book")
+    print("13. Search Member")
+    print("14. Total Members")
+    print("15. Exit")
 
     choice = input("Choose: ")
 
@@ -29,7 +47,19 @@ while True:
 
         author = input("Author: ")
 
-        add_book(title_name, author)
+        category = input("Category: ")
+
+        add_book(
+
+            title_name,
+
+            author,
+
+            category
+
+        )
+
+        print("Book Added Successfully")
 
         print("Book Added")
 
@@ -38,10 +68,21 @@ while True:
 
         books = view_books()
 
+        print("\n===== LIBRARY BOOKS =====\n")
+
         for book in books:
 
-            print(book)
+            print("ID      :", book[0])
 
+            print("Title   :", book[1])
+
+            print("Author  :", book[2])
+
+            print("Category:", book[3])
+
+            print("Status  :", book[4])
+
+            print("-"*40)
 
     elif choice == "3":
 
@@ -67,11 +108,121 @@ while True:
 
         print("Total Books:", total_books())
 
-
     elif choice == "6":
 
-        break
+        books = available_books()
 
+        print("\n===== AVAILABLE BOOKS =====\n")
+
+        for book in books:
+
+            print(book)
+            
+    elif choice == "7":
+
+        books = borrowed_books()
+
+        print("\n===== BORROWED BOOKS =====\n")
+
+        for book in books:
+
+            print(book)
+            
+    elif choice == "8":
+
+        title_name = input("Book Title: ")
+
+        print("1. Available")
+
+        print("2. Borrowed")
+
+        option = input("Choose Status: ")
+
+        if option == "1":
+
+            status = "Available"
+
+        else:
+
+            status = "Borrowed"
+
+        update_status(
+
+            title_name,
+
+            status
+
+        )
+
+        print("Status Updated")
+        
+    elif choice == "9":
+
+        name = input("Member Name: ")
+
+        email = input("Member Email: ")
+
+        add_member(name, email)
+
+        print("Member Added Successfully")
+        
+    elif choice == "10":
+
+        members = view_members()
+
+        print("\n===== MEMBERS =====\n")
+
+        for member in members:
+
+            print(member)
+            
+    elif choice == "11":
+
+        title_name = input("Book Title: ")
+
+        member = input("Member Name: ")
+
+        borrow_book(
+
+            title_name,
+
+            member
+
+        )
+
+        print("Book Borrowed")
+        
+    elif choice == "12":
+
+        title_name = input("Book Title: ")
+
+        return_book(title_name)
+
+        print("Book Returned")
+        
+    elif choice == "13":
+
+        keyword = input("Member Name: ")
+
+        data = search_member(keyword)
+
+        for member in data:
+
+            print(member)
+            
+    elif choice == "14":
+
+        print(
+
+            "Total Members:",
+
+            total_members()
+
+        )
+
+    elif choice == "15":
+
+        break
 
     else:
 
