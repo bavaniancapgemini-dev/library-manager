@@ -26,6 +26,25 @@ from database import (
 from search import search_book
 from reports import total_books
 from utils import title
+from auth import login, register
+
+print("===== LIBRARY LOGIN =====")
+
+username = input("Username: ")
+
+password = input("Password: ")
+
+user = login(username, password)
+
+if not user:
+
+    print("Invalid Login")
+
+    exit()
+
+role = user[0]
+
+print("Welcome", role)
 
 
 while True:
@@ -55,7 +74,8 @@ while True:
     print("21. View Reservations")
     print("22. Restock Books")
     print("23. Low Stock Report")
-    print("24. Exit")
+    print("24. Add Librarian")
+    print("25. Exit")
 
     choice = input("Choose: ")
 
@@ -118,12 +138,17 @@ while True:
 
     elif choice == "4":
 
-        title_name = input("Enter title to delete: ")
+        if role != "Admin":
 
-        delete_book(title_name)
+            print("❌ Only Admin can delete books.")
 
-        print("Book Deleted")
+        else:
 
+            title_name = input("Enter title to delete: ")
+
+            delete_book(title_name)
+
+            print("Book Deleted")
 
     elif choice == "5":
 
@@ -178,14 +203,20 @@ while True:
         print("Status Updated")
         
     elif choice == "9":
+        
+        if role != "Admin":
+            
+            print("Only Admin can Delete Books")
+            
+        else:
 
-        name = input("Member Name: ")
+            name = input("Member Name: ")
 
-        email = input("Member Email: ")
+            email = input("Member Email: ")
 
-        add_member(name, email)
+            add_member(name, email)
 
-        print("Member Added Successfully")
+            print("Member Added Successfully")
         
     elif choice == "10":
 
@@ -353,18 +384,24 @@ while True:
             print(item)
             
     elif choice=="22":
+        
+        if role != "Admin":
+            
+            print("❌ Only Admin can delete books.")
+            
+        else:
 
-        title=input("Book Title: ")
+            title=input("Book Title: ")
 
-        qty=int(input("Copies To Add: "))
+            qty=int(input("Copies To Add: "))
 
-        restock_book(
+            restock_book(
 
-            title,
+                title,
 
-            qty
+                qty
 
-        )
+            )
 
         print("Stock Updated")
         
@@ -377,8 +414,32 @@ while True:
         for item in books:
 
             print(item)
+            
+    elif choice=="24":
+
+        if role != "Admin":
+
+            print("Only Admin Can Add Librarians")
+
+        else:
+
+            username = input("Enter Username: ")
+
+            password = input("Enter Password: ")
+
+            register(
+
+                username,
+
+                password,
+
+                "Librarian"
+
+            )
+
+            print("Librarian Added Successfully")
         
-    elif choice == "24":
+    elif choice == "25":
 
         break
 
