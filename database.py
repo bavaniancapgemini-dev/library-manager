@@ -824,6 +824,37 @@ def low_stock():
 
     return data
 
+def update_book(book_id, title, author, category, copies):
+
+    import sqlite3
+
+    conn = sqlite3.connect("library.db")
+
+    cursor = conn.cursor()
+
+    cursor.execute(
+        """
+        UPDATE books
+        SET
+            title=?,
+            author=?,
+            category=?,
+            copies=?
+        WHERE id=?
+        """,
+        (
+            title,
+            author,
+            category,
+            copies,
+            book_id
+        )
+    )
+
+    conn.commit()
+
+    conn.close()
+
 create_reservation_table()
 create_member_table()
 create_transaction_table()
