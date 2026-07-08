@@ -1,16 +1,42 @@
 from tkinter import messagebox
 from database import add_book, view_books, update_book, delete_book_by_id, search_books, search_author, search_category, available_books, borrowed_books, dashboard_data
 from database import overdue_books, calculate_fine
+from datetime import datetime
 from reports import export_books
 from reports import export_members
+from theme import *
 import tkinter as tk
 from tkinter import ttk
 
 root = tk.Tk()
 
+root.configure(bg=BG_COLOR)
+
 root.title("Library Manager v8.0")
 
 root.geometry("700x500")
+
+def update_clock():
+
+    now = datetime.now()
+
+    clock.config(
+
+        text=now.strftime(
+
+            "%d-%m-%Y   %I:%M:%S %p"
+
+        )
+
+    )
+
+    root.after(
+
+        1000,
+
+        update_clock
+
+    )
 
 def export_books_gui():
 
@@ -452,11 +478,78 @@ heading = tk.Label(
 
     text="LIBRARY MANAGER",
 
-    font=("Arial",22,"bold")
+    font=("Arial",24,"bold"),
+
+    bg=BG_COLOR,
+
+    fg=HEADER_COLOR
 
 )
 
 heading.pack(pady=20)
+
+clock = tk.Label(
+
+    root,
+
+    bg=BG_COLOR,
+
+    font=("Arial",12)
+
+)
+
+clock.pack(pady=5)
+
+welcome = tk.Label(
+
+    root,
+
+    text="Welcome to Library Manager",
+
+    bg=BG_COLOR,
+
+    fg="green",
+
+    font=("Arial",12,"italic")
+
+)
+
+welcome.pack(pady=5)
+
+card = tk.Frame(
+
+    root,
+
+    bg=CARD_COLOR,
+
+    bd=2,
+
+    relief="ridge"
+
+)
+
+card.pack(
+
+    pady=15,
+
+    padx=15,
+
+    fill="x"
+
+)
+
+tk.Label(
+
+    card,
+
+    text="📚 Library Dashboard",
+
+    bg=CARD_COLOR,
+
+    font=("Arial",14,"bold")
+
+).pack(pady=10)
+
 
 add_btn = tk.Button(
 
@@ -465,6 +558,12 @@ add_btn = tk.Button(
     text="Add Book",
 
     width=25,
+    
+    bg=BUTTON_COLOR,
+
+    fg=BUTTON_TEXT,
+
+    font=("Arial",11,"bold"),
 
     command=add_book_window
 
@@ -479,6 +578,12 @@ view_btn = tk.Button(
     text="View Books",
 
     width=25,
+    
+    bg=BUTTON_COLOR,
+
+    fg=BUTTON_TEXT,
+
+    font=("Arial",11,"bold"),
 
     command=view_books_window
 
@@ -491,6 +596,12 @@ edit_btn = tk.Button(
     text="Edit Book",
 
     width=25,
+    
+    bg=BUTTON_COLOR,
+
+    fg=BUTTON_TEXT,
+
+    font=("Arial",11,"bold"),
 
     command=edit_book_window
 
@@ -507,6 +618,12 @@ search_btn = tk.Button(
     text="Search Books",
 
     width=25,
+    
+    bg=BUTTON_COLOR,
+
+    fg=BUTTON_TEXT,
+
+    font=("Arial",11,"bold"),
 
     command=search_window
 
@@ -521,6 +638,12 @@ delete_btn = tk.Button(
     text="Delete Book",
 
     width=25,
+    
+    bg=BUTTON_COLOR,
+
+    fg=BUTTON_TEXT,
+
+    font=("Arial",11,"bold"),
 
     command=delete_book_window
 
@@ -535,6 +658,12 @@ dashboard_btn = tk.Button(
     text="Dashboard",
 
     width=25,
+    
+    bg=BUTTON_COLOR,
+
+    fg=BUTTON_TEXT,
+
+    font=("Arial",11,"bold"),
 
     command=dashboard_window
 
@@ -549,6 +678,12 @@ overdue_btn = tk.Button(
     text="Overdue Books",
 
     width=25,
+    
+    bg=BUTTON_COLOR,
+
+    fg=BUTTON_TEXT,
+
+    font=("Arial",11,"bold"),
 
     command=overdue_window
 
@@ -563,6 +698,12 @@ books_report_btn = tk.Button(
     text="Export Books Excel",
 
     width=25,
+    
+    bg=BUTTON_COLOR,
+
+    fg=BUTTON_TEXT,
+
+    font=("Arial",11,"bold"),
 
     command=export_books_gui
 
@@ -577,6 +718,12 @@ members_report_btn = tk.Button(
     text="Export Members Excel",
 
     width=25,
+    
+    bg=BUTTON_COLOR,
+
+    fg=BUTTON_TEXT,
+
+    font=("Arial",11,"bold"),
 
     command=export_members_gui
 
@@ -591,6 +738,12 @@ exit_btn = tk.Button(
     text="Exit",
 
     width=25,
+    
+    bg=BUTTON_COLOR,
+
+    fg=BUTTON_TEXT,
+
+    font=("Arial",11,"bold"),
 
     command=root.destroy
 
@@ -598,5 +751,27 @@ exit_btn = tk.Button(
 
 exit_btn.pack(pady=5)
 
+status = tk.Label(
 
+    root,
+
+    text="Ready",
+
+    bd=1,
+
+    relief=tk.SUNKEN,
+
+    anchor="w"
+
+)
+
+status.pack(
+
+    side="bottom",
+
+    fill="x"
+
+)
+
+update_clock()
 root.mainloop()
