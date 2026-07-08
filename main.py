@@ -12,7 +12,11 @@ from database import (
     search_member,
     total_members,
     view_transactions,
-    overdue_books
+    overdue_books,
+    calculate_fine,
+    dashboard,
+    most_borrowed,
+    export_transactions
 )
 
 from search import search_book
@@ -40,7 +44,10 @@ while True:
     print("14. Total Members")
     print("15. Borrow History")
     print("16. Overdue Books")
-    print("17. Exit")
+    print("17. Fine Calculator")
+    print("18. Library Dashboard")
+    print("19. Export Transactions")
+    print("20. Exit")
 
     choice = input("Choose: ")
 
@@ -252,8 +259,67 @@ while True:
         for book in books:
             
             print(book)
-
+            
     elif choice == "17":
+
+        fines = calculate_fine()
+
+        print("\n===== FINES =====\n")
+
+        for item in fines:
+
+            print(
+
+                "Book:", item[0]
+
+            )
+
+            print(
+                "Member:", item[1]
+
+            )
+
+            print(
+
+                "Days:", item[2]
+
+            )
+
+            print(
+
+                "Fine: ₹", item[3]
+
+            )
+
+            print("-"*40)
+            
+    elif choice == "18":
+
+        stats = dashboard()
+
+        print("\n===== LIBRARY DASHBOARD =====\n")
+
+        print("Total Books :", stats[0])
+
+        print("Available   :", stats[1])
+
+        print("Borrowed    :", stats[2])
+
+        print("Members     :", stats[3])
+
+        print("\nMost Borrowed Books\n")
+
+        for book in most_borrowed():
+
+            print(book)
+            
+    elif choice == "19":
+
+        export_transactions()
+
+        print("transactions.csv created successfully")
+        
+    elif choice == "20":
 
         break
 

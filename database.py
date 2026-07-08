@@ -440,5 +440,193 @@ def overdue_books():
 
     return data
 
+from datetime import datetime
+
+def calculate_fine():
+
+    import sqlite3
+
+    conn = sqlite3.connect("library.db")
+
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        SELECT book_title,
+               member_name,
+               due_date
+        FROM transactions
+        WHERE return_date=''
+    """)
+
+    rows = cursor.fetchall()
+
+    conn.close()
+
+    fines = []
+
+    today = datetime.now()
+
+    for row in rows:
+
+        due = datetime.strptime(row[2], "%Y-%m-%d")
+
+        if today > due:
+
+            overdue = (today - due).days
+
+            fine = overdue * 10
+
+            fines.append(
+
+                (
+
+                    row[0],
+                    row[1],
+                    overdue,
+                    fine
+
+                )
+
+            )
+
+    return fines
+
+def dashboard():
+
+    import sqlite3
+
+    conn = sqlite3.connect("library.db")
+
+    cursor = conn.cursor()
+
+    cursor.execute("SELECT COUNT(*) FROM books")
+
+    total_books = cursor.fetchone()[0]
+
+    cursor.execute(
+
+        "SELECT COUNT(*) FROM books WHERE status='Available'"
+
+    )
+
+    available = cursor.fetchone()[0]
+
+    cursor.execute(
+
+        "SELECT COUNT(*) FROM books WHERE status='Borrowed'"
+
+    )
+
+    borrowed = cursor.fetchone()[0]
+
+    cursor.execute(
+
+        "SELECT COUNT(*) FROM members"
+
+    )
+
+    members = cursor.fetchone()[0]
+
+    conn.close()
+
+    return (
+
+        total_books,
+
+        available,
+
+        borrowed,
+
+        members
+
+    )
+    
+def most_borrowed():
+
+    import sqlite3
+
+    conn = sqlite3.connect("library.db")
+
+    cursor = conn.cursor()
+
+    cursor.execute("""
+
+    SELECT
+
+        book_title,
+
+        COUNT(*)
+
+    FROM transactions
+
+    GROUP BY book_title
+
+    ORDER BY COUNT(*) DESC
+
+    LIMIT 5
+
+    """)
+
+    data = cursor.fetchall()
+
+    conn.close()
+
+    return data
+
+import csv
+
+def export_transactions():
+
+    import sqlite3
+
+    conn = sqlite3.connect("library.db")
+
+    cursor = conn.cursor()
+
+    cursor.execute(
+
+        "SELECT * FROM transactions"
+
+    )
+
+    rows = cursor.fetchall()
+
+    conn.close()
+
+    with open(
+
+        "transactions.csv",
+
+        "w",
+
+        newline=""
+
+    ) as file:
+
+        writer = csv.writer(file)
+
+        writer.writerow(
+
+            [
+
+                "ID",
+
+                "Book",
+
+                "Member",
+
+                "Borrow Date",
+
+                "Due Date",
+
+                "Return Date"
+
+            ]
+
+        )
+
+        writer.writerows(rows)
+        
+
 create_member_table()
 create_transaction_table()
