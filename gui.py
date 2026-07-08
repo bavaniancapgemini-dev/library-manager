@@ -1,5 +1,5 @@
 from tkinter import messagebox
-from database import add_book, view_books, update_book, delete_book_by_id
+from database import add_book, view_books, update_book, delete_book_by_id, search_books, search_author, search_category, available_books, borrowed_books
 
 import tkinter as tk
 from tkinter import ttk
@@ -9,6 +9,58 @@ root = tk.Tk()
 root.title("Library Manager v8.0")
 
 root.geometry("700x500")
+
+def search_window():
+
+    window = tk.Toplevel(root)
+
+    window.title("Search Books")
+
+    window.geometry("400x250")
+
+    tk.Label(
+
+        window,
+
+        text="Book Title"
+
+    ).pack()
+
+    entry = tk.Entry(window,width=30)
+
+    entry.pack()
+
+    def search():
+
+        books = search_books(entry.get())
+
+        message = ""
+
+        for book in books:
+
+            message += str(book) + "\n"
+
+        if message == "":
+
+            message = "No Books Found"
+
+        messagebox.showinfo(
+
+            "Results",
+
+            message
+
+        )
+
+    tk.Button(
+
+        window,
+
+        text="Search",
+
+        command=search
+
+    ).pack(pady=20)
 
 def delete_book_window():
 
@@ -366,9 +418,11 @@ search_btn = tk.Button(
 
     root,
 
-    text="Search Book",
+    text="Search Books",
 
-    width=25
+    width=25,
+
+    command=search_window
 
 )
 
@@ -401,7 +455,6 @@ exit_btn = tk.Button(
 )
 
 exit_btn.pack(pady=5)
-
 
 
 root.mainloop()

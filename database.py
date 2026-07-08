@@ -874,6 +874,152 @@ def delete_book_by_id(book_id):
     conn.commit()
 
     conn.close()
+    
+def search_books(keyword):
+
+    import sqlite3
+
+    conn = sqlite3.connect("library.db")
+
+    cursor = conn.cursor()
+
+    cursor.execute(
+
+        """
+
+        SELECT *
+
+        FROM books
+
+        WHERE title LIKE ?
+
+        """,
+
+        ("%"+keyword+"%",)
+
+    )
+
+    data = cursor.fetchall()
+
+    conn.close()
+
+    return data
+
+def search_author(author):
+
+    import sqlite3
+
+    conn = sqlite3.connect("library.db")
+
+    cursor = conn.cursor()
+
+    cursor.execute(
+
+        """
+
+        SELECT *
+
+        FROM books
+
+        WHERE author LIKE ?
+
+        """,
+
+        ("%"+author+"%",)
+
+    )
+
+    data = cursor.fetchall()
+
+    conn.close()
+
+    return data
+
+def search_category(category):
+
+    import sqlite3
+
+    conn = sqlite3.connect("library.db")
+
+    cursor = conn.cursor()
+
+    cursor.execute(
+
+        """
+
+        SELECT *
+
+        FROM books
+
+        WHERE category LIKE ?
+
+        """,
+
+        ("%"+category+"%",)
+
+    )
+
+    data = cursor.fetchall()
+
+    conn.close()
+
+    return data
+
+def available_books():
+
+    import sqlite3
+
+    conn = sqlite3.connect("library.db")
+
+    cursor = conn.cursor()
+
+    cursor.execute(
+
+        """
+
+        SELECT *
+
+        FROM books
+
+        WHERE status='Available'
+
+        """
+
+    )
+
+    data = cursor.fetchall()
+
+    conn.close()
+
+    return data
+
+def borrowed_books():
+
+    import sqlite3
+
+    conn = sqlite3.connect("library.db")
+
+    cursor = conn.cursor()
+
+    cursor.execute(
+
+        """
+
+        SELECT *
+
+        FROM books
+
+        WHERE status='Borrowed'
+
+        """
+
+    )
+
+    data = cursor.fetchall()
+
+    conn.close()
+
+    return data
 
 create_reservation_table()
 create_member_table()
