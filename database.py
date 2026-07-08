@@ -854,6 +854,26 @@ def update_book(book_id, title, author, category, copies):
     conn.commit()
 
     conn.close()
+    
+def delete_book_by_id(book_id):
+
+    import sqlite3
+
+    conn = sqlite3.connect("library.db")
+
+    cursor = conn.cursor()
+
+    cursor.execute(
+
+        "DELETE FROM books WHERE id=?",
+
+        (book_id,)
+
+    )
+
+    conn.commit()
+
+    conn.close()
 
 create_reservation_table()
 create_member_table()

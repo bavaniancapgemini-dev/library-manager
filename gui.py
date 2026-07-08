@@ -1,5 +1,5 @@
 from tkinter import messagebox
-from database import add_book, view_books, update_book
+from database import add_book, view_books, update_book, delete_book_by_id
 
 import tkinter as tk
 from tkinter import ttk
@@ -9,6 +9,66 @@ root = tk.Tk()
 root.title("Library Manager v8.0")
 
 root.geometry("700x500")
+
+def delete_book_window():
+
+    window = tk.Toplevel(root)
+
+    window.title("Delete Book")
+
+    window.geometry("300x180")
+
+    tk.Label(
+
+        window,
+
+        text="Book ID"
+
+    ).pack(pady=10)
+
+    id_entry = tk.Entry(window)
+
+    id_entry.pack()
+
+    def delete():
+
+        answer = messagebox.askyesno(
+
+            "Confirm",
+
+            "Delete this book?"
+
+        )
+
+        if answer:
+
+            delete_book_by_id(
+
+                int(id_entry.get())
+
+            )
+
+            messagebox.showinfo(
+
+                "Success",
+
+                "Book Deleted"
+
+            )
+
+            window.destroy()
+
+    tk.Button(
+
+        window,
+
+        text="Delete",
+
+        command=delete,
+
+        width=20
+
+    ).pack(pady=20)
 
 def edit_book_window():
 
@@ -320,7 +380,9 @@ delete_btn = tk.Button(
 
     text="Delete Book",
 
-    width=25
+    width=25,
+
+    command=delete_book_window
 
 )
 
