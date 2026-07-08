@@ -1,5 +1,5 @@
+from datetime import datetime, timedelta
 import sqlite3
-
 
 connection = sqlite3.connect("library.db")
 
@@ -19,6 +19,10 @@ category TEXT,
 status TEXT,
 
 borrowed_by TEXT,
+
+borrow_date TEXT,
+
+due_date TEXT,
 
 copies INTEGER
 
@@ -281,45 +285,36 @@ def total_members():
 
     return count
 
-def borrow_book(title, member, borrow_date, due_date):
+def borrow_book(title, member):
 
     import sqlite3
+
+    from datetime import datetime, timedelta
 
     conn = sqlite3.connect("library.db")
 
     cursor = conn.cursor()
 
+    borrow_date = datetime.now()
+
+    due_date = borrow_date + timedelta(days=14)
+
     cursor.execute(
         """
         UPDATE books
-        SET status=?,
-            borrowed_by=?
+        SET
+            status=?,
+            borrowed_by=?,
+            borrow_date=?,
+            due_date=?
         WHERE title=?
         """,
         (
             "Borrowed",
             member,
+            borrow_date.strftime("%Y-%m-%d"),
+            due_date.strftime("%Y-%m-%d"),
             title
-        )
-    )
-
-    cursor.execute(
-        """
-        INSERT INTO transactions(
-            book_title,
-            member_name,
-            borrow_date,
-            due_date,
-            return_date
-        )
-        VALUES(?,?,?,?,?)
-        """,
-        (
-            title,
-            member,
-            borrow_date,
-            due_date,
-            ""
         )
     )
 
@@ -331,8 +326,6 @@ def return_book(title):
 
     import sqlite3
 
-    from datetime import datetime
-
     conn = sqlite3.connect("library.db")
 
     cursor = conn.cursor()
@@ -340,25 +333,15 @@ def return_book(title):
     cursor.execute(
         """
         UPDATE books
-        SET status=?,
-            borrowed_by=?
+        SET
+            status=?,
+            borrowed_by='',
+            borrow_date='',
+            due_date=''
         WHERE title=?
         """,
         (
             "Available",
-            "",
-            title
-        )
-    )
-
-    cursor.execute(
-        """
-        UPDATE transactions
-        SET return_date=?
-        WHERE book_title=? AND return_date=''
-        """,
-        (
-            datetime.now().strftime("%Y-%m-%d"),
             title
         )
     )
@@ -1020,6 +1003,95 @@ def borrowed_books():
     conn.close()
 
     return data
+
+def dashboard_data():
+
+    import sqlite3
+
+    conn = sqlite3.connect("library.db")
+
+    cursor = conn.cursor()
+
+    cursor.execute("SELECT COUNT(*) FROM books")
+    total_books = cursor.fetchone()[0]
+
+    cursor.execute("SELECT COUNT(*) FROM members")
+    total_members = cursor.fetchone()[0]
+
+    cursor.execute(
+        "SELECT COUNT(*) FROM books WHERE status='Available'"
+    )
+    available = cursor.fetchone()[0]
+
+    cursor.execute(
+        "SELECT COUNT(*) FROM books WHERE status='Borrowed'"
+    )
+    borrowed = cursor.fetchone()[0]
+
+    conn.close()
+
+    return (
+        total_books,
+        total_members,
+        available,
+        borrowed
+    )
+
+def calculate_fine(due_date):
+
+    from datetime import datetime
+
+    if due_date == "":
+        return 0
+
+    due = datetime.strptime(due_date, "%Y-%m-%d")
+
+    today = datetime.now()
+
+    if today <= due:
+        return 0
+
+    days = (today - due).days
+
+    return days * 10
+
+def overdue_books():
+
+    import sqlite3
+
+    from datetime import datetime
+
+    conn = sqlite3.connect("library.db")
+
+    cursor = conn.cursor()
+
+    cursor.execute(
+        """
+        SELECT *
+        FROM books
+        WHERE status='Borrowed'
+        """
+    )
+
+    books = cursor.fetchall()
+
+    overdue = []
+
+    today = datetime.now()
+
+    for book in books:
+
+        if book[7]:
+
+            due = datetime.strptime(book[7], "%Y-%m-%d")
+
+            if today > due:
+
+                overdue.append(book)
+
+    conn.close()
+
+    return overdue
 
 create_reservation_table()
 create_member_table()

@@ -1,6 +1,6 @@
 from tkinter import messagebox
-from database import add_book, view_books, update_book, delete_book_by_id, search_books, search_author, search_category, available_books, borrowed_books
-
+from database import add_book, view_books, update_book, delete_book_by_id, search_books, search_author, search_category, available_books, borrowed_books, dashboard_data
+from database import overdue_books, calculate_fine
 import tkinter as tk
 from tkinter import ttk
 
@@ -9,6 +9,66 @@ root = tk.Tk()
 root.title("Library Manager v8.0")
 
 root.geometry("700x500")
+
+def overdue_window():
+
+    books = overdue_books()
+
+    message = ""
+
+    for book in books:
+
+        fine = calculate_fine(book[7])
+
+        message += f"{book[1]} - ₹{fine}\n"
+
+    if message == "":
+        message = "No overdue books."
+
+    messagebox.showinfo(
+        "Overdue Books",
+        message
+    )
+
+def dashboard_window():
+
+    window = tk.Toplevel(root)
+
+    window.title("Library Dashboard")
+
+    window.geometry("450x350")
+
+    books, members, available, borrowed = dashboard_data()
+
+    tk.Label(
+        window,
+        text="LIBRARY DASHBOARD",
+        font=("Arial",18,"bold")
+    ).pack(pady=20)
+
+    tk.Label(
+        window,
+        text=f"📚 Total Books : {books}",
+        font=("Arial",14)
+    ).pack(pady=10)
+
+    tk.Label(
+        window,
+        text=f"👥 Total Members : {members}",
+        font=("Arial",14)
+    ).pack(pady=10)
+
+    tk.Label(
+        window,
+        text=f"✅ Available Books : {available}",
+        font=("Arial",14)
+    ).pack(pady=10)
+
+    tk.Label(
+        window,
+        text=f"📖 Borrowed Books : {borrowed}",
+        font=("Arial",14)
+    ).pack(pady=10)
 
 def search_window():
 
@@ -441,6 +501,34 @@ delete_btn = tk.Button(
 )
 
 delete_btn.pack(pady=5)
+
+dashboard_btn = tk.Button(
+
+    root,
+
+    text="Dashboard",
+
+    width=25,
+
+    command=dashboard_window
+
+)
+
+dashboard_btn.pack(pady=5)
+
+overdue_btn = tk.Button(
+
+    root,
+
+    text="Overdue Books",
+
+    width=25,
+
+    command=overdue_window
+
+)
+
+overdue_btn.pack(pady=5)
 
 exit_btn = tk.Button(
 
