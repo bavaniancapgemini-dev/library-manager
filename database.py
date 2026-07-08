@@ -7,12 +7,21 @@ cursor = connection.cursor()
 
 cursor.execute("""
 CREATE TABLE IF NOT EXISTS books(
+
 id INTEGER PRIMARY KEY AUTOINCREMENT,
+
 title TEXT,
+
 author TEXT,
+
 category TEXT,
+
 status TEXT,
-borrowed_by TEXT
+
+borrowed_by TEXT,
+
+copies INTEGER
+
 )
 """)
 
@@ -20,7 +29,7 @@ connection.commit()
 
 connection.close()
 
-def add_book(title, author, category):
+def add_book(title, author, category, copies):
 
     import sqlite3
 
@@ -30,16 +39,50 @@ def add_book(title, author, category):
 
     cursor.execute(
 
-        "INSERT INTO books(title,author,category,status) VALUES(?,?,?,?)",
+        """
 
-        (title, author, category, "Available")
+        INSERT INTO books(
+
+        title,
+
+        author,
+
+        category,
+
+        status,
+
+        borrowed_by,
+
+        copies
+
+        )
+
+        VALUES(?,?,?,?,?,?)
+
+        """,
+
+        (
+
+            title,
+
+            author,
+
+            category,
+
+            "Available",
+
+            "",
+
+            copies
+
+        )
 
     )
 
     conn.commit()
 
     conn.close()
-
+    
 def view_books():
 
     connection = sqlite3.connect("library.db")
@@ -627,6 +670,160 @@ def export_transactions():
 
         writer.writerows(rows)
         
+def create_reservation_table():
 
+    import sqlite3
+
+    conn = sqlite3.connect("library.db")
+
+    cursor = conn.cursor()
+
+    cursor.execute("""
+
+    CREATE TABLE IF NOT EXISTS reservations(
+
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+
+    member_name TEXT,
+
+    book_title TEXT,
+
+    reservation_date TEXT
+
+    )
+
+    """)
+
+    conn.commit()
+
+    conn.close()
+    
+from datetime import datetime
+
+def reserve_book(member, book):
+
+    import sqlite3
+
+    conn = sqlite3.connect("library.db")
+
+    cursor = conn.cursor()
+
+    cursor.execute(
+
+        """
+
+        INSERT INTO reservations(
+
+        member_name,
+
+        book_title,
+
+        reservation_date
+
+        )
+
+        VALUES(?,?,?)
+
+        """,
+
+        (
+
+            member,
+
+            book,
+
+            datetime.now().strftime("%Y-%m-%d")
+
+        )
+
+    )
+
+    conn.commit()
+
+    conn.close()
+    
+def view_reservations():
+
+    import sqlite3
+
+    conn = sqlite3.connect("library.db")
+
+    cursor = conn.cursor()
+
+    cursor.execute(
+
+        "SELECT * FROM reservations"
+
+    )
+
+    data = cursor.fetchall()
+
+    conn.close()
+
+    return data
+
+def restock_book(title, qty):
+
+    import sqlite3
+
+    conn = sqlite3.connect("library.db")
+
+    cursor = conn.cursor()
+
+    cursor.execute(
+
+        """
+
+        UPDATE books
+
+        SET copies=copies+?
+
+        WHERE title=?
+
+        """,
+
+        (
+
+            qty,
+
+            title
+
+        )
+
+    )
+
+    conn.commit()
+
+    conn.close()
+    
+def low_stock():
+
+    import sqlite3
+
+    conn = sqlite3.connect("library.db")
+
+    cursor = conn.cursor()
+
+    cursor.execute(
+
+        """
+
+        SELECT *
+
+        FROM books
+
+        WHERE copies<=2
+
+        """
+
+    )
+
+    data = cursor.fetchall()
+
+    conn.close()
+
+    return data
+
+create_reservation_table()
 create_member_table()
 create_transaction_table()

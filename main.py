@@ -16,7 +16,11 @@ from database import (
     calculate_fine,
     dashboard,
     most_borrowed,
-    export_transactions
+    export_transactions,
+    reserve_book,
+    view_reservations,
+    restock_book,
+    low_stock
 )
 
 from search import search_book
@@ -47,7 +51,11 @@ while True:
     print("17. Fine Calculator")
     print("18. Library Dashboard")
     print("19. Export Transactions")
-    print("20. Exit")
+    print("20. Reserve Book")
+    print("21. View Reservations")
+    print("22. Restock Books")
+    print("23. Low Stock Report")
+    print("24. Exit")
 
     choice = input("Choose: ")
 
@@ -60,16 +68,18 @@ while True:
 
         category = input("Category: ")
 
+        copies = int(input("Number of Copies: "))
+
         add_book(
 
-            title_name,
+            title,
 
             author,
 
-            category
+            category,
 
+            copies
         )
-
         print("Book Added Successfully")
 
         print("Book Added")
@@ -319,7 +329,56 @@ while True:
 
         print("transactions.csv created successfully")
         
-    elif choice == "20":
+    elif choice=="20":
+        
+        member=input("Member Name: ")
+        
+        book=input("Book Title: ")
+        
+        reserve_book(
+            
+            member,
+            book
+        )
+        print("Book Reserved")
+        
+    elif choice=="21":
+
+        reservations=view_reservations()
+
+        print("\n===== RESERVATIONS =====\n")
+
+        for item in reservations:
+
+            print(item)
+            
+    elif choice=="22":
+
+        title=input("Book Title: ")
+
+        qty=int(input("Copies To Add: "))
+
+        restock_book(
+
+            title,
+
+            qty
+
+        )
+
+        print("Stock Updated")
+        
+    elif choice=="23":
+
+        books=low_stock()
+
+        print("\n===== LOW STOCK =====\n")
+
+        for item in books:
+
+            print(item)
+        
+    elif choice == "24":
 
         break
 
