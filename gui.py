@@ -1,6 +1,8 @@
 from tkinter import messagebox
 from database import add_book, view_books, update_book, delete_book_by_id, search_books, search_author, search_category, available_books, borrowed_books, dashboard_data
 from database import overdue_books, calculate_fine
+from reports import export_books
+from reports import export_members
 import tkinter as tk
 from tkinter import ttk
 
@@ -9,6 +11,30 @@ root = tk.Tk()
 root.title("Library Manager v8.0")
 
 root.geometry("700x500")
+
+def export_books_gui():
+
+    export_books()
+
+    messagebox.showinfo(
+
+        "Success",
+
+        "Books Report Saved"
+
+    )
+    
+def export_members_gui():
+
+    export_members()
+
+    messagebox.showinfo(
+
+        "Success",
+
+        "Members Report Saved"
+
+    )
 
 def overdue_window():
 
@@ -529,6 +555,34 @@ overdue_btn = tk.Button(
 )
 
 overdue_btn.pack(pady=5)
+
+books_report_btn = tk.Button(
+
+    root,
+
+    text="Export Books Excel",
+
+    width=25,
+
+    command=export_books_gui
+
+)
+
+books_report_btn.pack(pady=5)
+
+members_report_btn = tk.Button(
+
+    root,
+
+    text="Export Members Excel",
+
+    width=25,
+
+    command=export_members_gui
+
+)
+
+members_report_btn.pack(pady=5)
 
 exit_btn = tk.Button(
 
