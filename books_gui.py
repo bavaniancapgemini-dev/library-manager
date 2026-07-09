@@ -1,8 +1,10 @@
 import tkinter as tk
-from tkinter import ttk
+from tkinter import ttk, messagebox
 from add_book_gui import AddBookGUI
 from edit_book_gui import EditBookGUI
-from database import view_books
+from database import view_books, delete_book_by_id
+from PIL import Image
+from PIL import ImageTk
 
 
 class BooksGUI:
@@ -96,6 +98,23 @@ class BooksGUI:
             pady=10
 
         )
+        self.cover = tk.Label(
+            self.window
+        )
+
+        self.cover.pack(
+            side="right",
+            padx=20,
+            pady=20
+        )
+        
+        self.tree.bind(
+
+            "<<TreeviewSelect>>",
+
+            self.show_cover
+
+        )
 
         bottom = tk.Frame(self.window)
 
@@ -116,15 +135,12 @@ class BooksGUI:
         ).grid(row=0,column=1,padx=5)
         
         tk.Button(
-
             bottom,
-
             text="Delete Book",
-
-            width=15
-
+            width=15,
+            command=self.delete_selected
         ).grid(row=0,column=2,padx=5)
-
+        
         tk.Button(
 
             bottom,
@@ -194,3 +210,70 @@ class BooksGUI:
                 )
 
             break
+        
+    def delete_selected(self):
+
+        selected = self.tree.focus()
+
+        if not selected:
+
+            messagebox.showwarning(
+                "Warning",
+                "Please select a book first."
+            )
+
+            return
+
+        values = self.tree.item(selected)["values"]
+
+        answer = messagebox.askyesno(
+            "Confirm Delete",
+            f"Delete '{values[1]}' ?"
+        )
+
+        if answer:
+
+            delete_book_by_id(values[0])
+
+            messagebox.showinfo(
+                "Success",
+                "Book Deleted Successfully"
+            )
+
+            self.load_books()
+            
+    def show_cover(self,event):
+
+        selected=self.tree.focus()
+
+        if not selected:
+
+            return
+
+        values=self.tree.item(selected)["values"]
+
+        books=view_books()
+
+        for book in books:
+
+            if book[0]==values[0]:
+
+                path=book[10]
+
+                break
+
+        try:
+
+            image=Image.open(path)
+
+            image=image.resize((170,220))
+
+            photo=ImageTk.PhotoImage(image)
+
+            self.cover.configure(image=photo)
+
+            self.cover.image=photo
+
+        except:
+
+            self.cover.configure(image="")

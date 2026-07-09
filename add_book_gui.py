@@ -1,5 +1,6 @@
 import tkinter as tk
 from tkinter import messagebox
+from tkinter import filedialog
 from database import add_book
 
 
@@ -14,6 +15,8 @@ class AddBookGUI:
         self.window.title("Add New Book")
 
         self.window.geometry("400x420")
+        
+        self.cover_path = ""
 
         tk.Label(self.window, text="Title").pack(pady=5)
         self.title_entry = tk.Entry(self.window, width=40)
@@ -41,6 +44,16 @@ class AddBookGUI:
             command=self.save_book,
             width=20
         ).pack(pady=20)
+        
+        tk.Button(
+
+            self.window,
+
+            text="Choose Cover",
+
+            command=self.choose_cover
+
+        ).pack(pady=5)
 
     def save_book(self):
 
@@ -51,7 +64,8 @@ class AddBookGUI:
                 self.author_entry.get(),
                 self.isbn_entry.get(),
                 self.category_entry.get(),
-                int(self.copies_entry.get())
+                int(self.copies_entry.get()),
+                self.cover_path
             )
 
             messagebox.showinfo(
@@ -70,3 +84,19 @@ class AddBookGUI:
                 "Error",
                 str(e)
             )
+            
+    def choose_cover(self):
+
+        filename = filedialog.askopenfilename(
+
+            filetypes=[
+
+                ("Images","*.png *.jpg *.jpeg")
+
+            ]
+
+        )
+
+        if filename:
+
+            self.cover_path = filename

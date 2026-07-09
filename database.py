@@ -24,7 +24,8 @@ def initialize_database():
         borrowed_by TEXT,
         borrow_date TEXT,
         due_date TEXT,
-        copies INTEGER
+        copies INTEGER,
+        cover TEXT
     )
     """)
 
@@ -81,7 +82,7 @@ def initialize_database():
 
 initialize_database()
 
-def add_book(title, author, isbn, category, copies):
+def add_book(title, author, isbn, category, copies, cover):
 
     conn = get_connection()
     cursor = conn.cursor()
@@ -98,11 +99,12 @@ def add_book(title, author, isbn, category, copies):
             borrowed_by,
             borrow_date,
             due_date,
-            copies
+            copies,
+            cover
         )
 
         VALUES
-        (?,?,?,?,?,?,?,?,?)
+        (?,?,?,?,?,?,?,?,?,?)
         """,
 
         (
@@ -114,7 +116,8 @@ def add_book(title, author, isbn, category, copies):
             "",
             "",
             "",
-            copies
+            copies,
+            cover
         )
     )
 
