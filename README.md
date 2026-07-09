@@ -1,114 +1,162 @@
-# 📚 Library Manager
+# 📚 Library Manager v30.0
 
-A modern and efficient Library Management System Built to manage books, users, borrowing records, and library operations efficiently. This project demonstrates concepts of database management, CRUD operations, validation, modular programming, and backend system architecture.\
+A modern Python-based Library Management System built with **Tkinter**, **SQLite**, and **OpenPyXL**.
+
+This project has evolved from a simple CRUD application into a feature-rich desktop application with authentication, analytics, reports, reservations, reviews, and book cover support.
 
 ---
 
 ## 🚀 Features
 
-- Add Books
-- Update Book Details
-- Delete Books
-- Search Books
-- Issue Books
-- Return Books
-- User Management
-- Borrowing Records
-- Due Date Tracking
-- Input Validation
-- Database Integration
-- Modular Code Structure
+### 📖 Book Management
+- Add books
+- Edit books
+- Delete books
+- Search books
+- Search by ISBN
+- Search by author
+- Search by category
+- View available books
+- View borrowed books
+- Low stock detection
+- Restock books
+- Book cover support
 
 ---
 
-## 🛠️ Tech Stack
+### 👥 Member Management
+- Add members
+- View members
+- Search members
+- Total member statistics
 
-- Python
-- SQLite / MySQL
-- File Handling
-- Object-Oriented Programming
-- Database Queries
+---
+
+### 🔐 Authentication
+- Admin Login
+- Librarian Login
+- Role-based permissions
+- Secure user management
+
+---
+
+### 📚 Borrowing System
+- Borrow books
+- Return books
+- Borrow history
+- Due date tracking
+- Overdue books
+- Fine calculation
+- Transaction history
+
+---
+
+### ⭐ Reviews
+- Add book reviews
+- Ratings (1–5)
+- View all reviews
+
+---
+
+### 📌 Reservations
+- Reserve books
+- View reservations
+- Waitlist management
+
+---
+
+### 📊 Analytics
+- Library dashboard
+- Total books
+- Total members
+- Borrowed books
+- Available books
+- Most borrowed books
+
+---
+
+### 📁 Reports
+- Export books to Excel
+- Export members to Excel
+- Export transactions to CSV
+
+---
+
+### 🖼 GUI
+- Tkinter Desktop Interface
+- Books Management Window
+- Dashboard
+- Add/Edit Book Windows
+- Book Cover Upload
+
+---
+
+## 🛠 Technologies Used
+
+- Python 3
+- Tkinter
+- SQLite3
+- OpenPyXL
+- Pillow (PIL)
 
 ---
 
 ## 📂 Project Structure
 
-```bash
+```text
 library-manager/
-|
+│
 ├── main.py
-├── books.py
-├── users.py
+├── gui.py
+├── dashboard.py
 ├── database.py
-├── validation.py
+├── auth.py
+├── books_gui.py
+├── add_book_gui.py
+├── edit_book_gui.py
+├── analytics.py
+├── reports.py
+├── search.py
 ├── utils.py
-├── records.py
+├── cover_manager.py
+├── backup_manager.py
+├── charts.py
+├── library.db
+├── Covers/
+├── Reports/
+├── Backups/
 └── README.md
 ```
 
 ---
 
-## 📌Module Overview
+## ▶️ Installation
 
-### `main/py`
-Acts as the main entry point of the application.
-
-### `books.py`
-Handles adding, updating, deleting, and searching books.
-
-### `users.py`
-Manages library users and user-related operations.
-
-### `database.py`
-Responsible for database connection, queries, and data storage.
-
-### `validations.py`
-Contains validation logic and input checking functions.
-
-### `utils.py`
-Reusable helper functions used throughout the project.
-
-### `records.py`
-Handles book issue records, return tracking, and due dates.
-
----
-
-## 💡 Functionalities
-
-- Manage book inventory
-- Track issued and returned books
-- Store user records
-- Maintain borrowing history
-- Search books efficiently
-- Handle due date management
-
----
-
-## 🔒System Features
-
-- Input Validation
-- Error Handling
-- Duplicate Entry Prevention
-- Structured Data Storage
-- Secure Record Management
-
----
-
-## ⚡ Installation
-
-Clone the repository:
+Clone the repository
 
 ```bash
-git clone https://github.com/library-manager/library-manager.git
+git clone https://github.com/bavaniancapgemini-dev/library-manager.git
 ```
 
-Move into the project directory:
+Move into the project
 
 ```bash
 cd library-manager
 ```
 
-Run the project:
+Install dependencies
+
+```bash
+pip install pillow openpyxl
+```
+
+Run
+
+```bash
+python gui.py
+```
+
+or
 
 ```bash
 python main.py
@@ -116,117 +164,34 @@ python main.py
 
 ---
 
-## 🧪 Example Workflow
+## 📌 Current Version
 
-1. Admin adds books to the library
-2. Users are registered into the system
-3. Books are issued to users
-4. Borrowing records are stored in the database
-5. Returned books are updated automatically
+**Version:** v30.0
 
 ---
 
-## 📈Future Improvements
+## 🔮 Upcoming Features
 
-- Barcode Scanner Integration
-- QR Code Support
-- Fine Calculation System
-- Email Notifications
-- Admin Dashboard
-- Online Book Reservations
-- Multi-User Authertication
-- Cloud Database Integration
-- REST API Support
-
----
-
-## 🎯 Learning Outcomes
-
-This project helped in understanding:
-
-- CRUD Operations
-- Database Management
-- Backend Architecture
-- Validation Techniques
-- Record Management Systems
-- Modular Programming
-- Data Handling
-- Application Scalability
+- QR Code for books
+- Barcode scanner
+- Email reminders
+- Cloud database
+- Multi-library support
+- AI book recommendations
+- Dark mode
+- Charts & graphs
+- Backup & restore
+- Mobile companion app
 
 ---
 
-## 📊 Possible Enhancements
+## 👩‍💻 Author
 
-- Analytics Dashboard
-- Book Recommendation System
-- Search Filters
-- Export Reports
-- User Activity Logs
-- Mobile Responsive
-- Interface
-- Dark Mode Support
+**Bavani.Ch**
+
+GitHub:
+https://github.com/bavaniancapgemini-dev
 
 ---
 
-## 📸Screenshots
-
-Add screenshots of:
-- Dashboard
-- Book Management Section
-- User Management
-- Borrow records
-- Database Tables
-
-Example:
-
-```md
-![Dashboard Screenshot](images/dashboard.png)
-```
-
----
-
-## 🎥Demo
-
-Add development link or demo video here.
-
----
-
-## 🏗️ Architecture
-
-The project follows a modular architecture where book management, user operations, database handling, validation, and record tracking are separated into different modules for maintainability and scalability.
-
----
-
-## 🌟 Highlights
-
-- Clean and Readable Code
-- Beginner-Friendly Architecture
-- Real-World Management System Logic
-- Modular and Scalable Design
-- Efficient Data Handling
-
----
-
-## 🤝 Contributing
-
-Contributions are welcome. Feel free to fork the repository and submit pull requests.
-
----
-
-## 📜 License
-
-This project is licensed under the MIT License.
-
----
-
-## 👨‍💻Author
-
-Developed by Bavani.Ch
-
-GitHub: https://github.com/library-manager
-
----
-
-## ⭐Support
-
-If you found this project useful, consider giving it a star on GitHub.
+⭐ If you like this project, don't forget to star the repository!
