@@ -1,114 +1,159 @@
-from datetime import datetime, timedelta
 import sqlite3
+from datetime import datetime, timedelta
+import csv
 
-connection = sqlite3.connect("library.db")
+DATABASE = "library.db"
 
-cursor = connection.cursor()
 
-cursor.execute("""
-CREATE TABLE IF NOT EXISTS books(
+def get_connection():
+    return sqlite3.connect(DATABASE)
 
-id INTEGER PRIMARY KEY AUTOINCREMENT,
+def initialize_database():
 
-title TEXT,
+    conn = get_connection()
+    cursor = conn.cursor()
 
-author TEXT,
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS books(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        title TEXT,
+        author TEXT,
+        isbn TEXT UNIQUE,
+        category TEXT,
+        status TEXT,
+        borrowed_by TEXT,
+        borrow_date TEXT,
+        due_date TEXT,
+        copies INTEGER
+    )
+    """)
 
-isbn TEXT UNIQUE,
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS members(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        name TEXT,
+        phone TEXT
+    )
+    """)
 
-category TEXT,
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS transactions(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        book_title TEXT,
+        member_name TEXT,
+        borrow_date TEXT,
+        due_date TEXT,
+        return_date TEXT
+    )
+    """)
 
-status TEXT,
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS reservations(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        member_name TEXT,
+        book_title TEXT,
+        reservation_date TEXT
+    )
+    """)
 
-borrowed_by TEXT,
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS reviews(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        book_title TEXT,
+        member_name TEXT,
+        rating INTEGER,
+        review TEXT
+    )
+    """)
 
-borrow_date TEXT,
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS waitlist(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        book_title TEXT,
+        member_name TEXT,
+        request_date TEXT
+    )
+    """)
 
-due_date TEXT,
+    conn.commit()
+    conn.close()
 
-copies INTEGER
 
-)
-""")
-
-cursor.execute("""
-CREATE TABLE IF NOT EXISTS reviews(
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    book_title TEXT,
-    member_name TEXT,
-    rating INTEGER,
-    review TEXT
-)
-""")
-
-cursor.execute("""
-CREATE TABLE IF NOT EXISTS waitlist(
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    book_title TEXT,
-    member_name TEXT,
-    request_date TEXT
-)
-""")
-
-connection.commit()
-
-connection.commit()
-
-connection.commit()
-
-connection.close()
+initialize_database()
 
 def add_book(title, author, isbn, category, copies):
 
-    import sqlite3
+    conn = get_connection()
+    cursor = conn.cursor()
 
-    conn = sqlite3.connect("library.db")
+    cursor.execute(
+        """
+        INSERT INTO books
+        (
+            title,
+            author,
+            isbn,
+            category,
+            status,
+            borrowed_by,
+            borrow_date,
+            due_date,
+            copies
+        )
+
+        VALUES
+        (?,?,?,?,?,?,?,?,?)
+        """,
+
+        (
+            title,
+            author,
+            isbn,
+            category,
+            "Available",
+            "",
+            "",
+            "",
+            copies
+        )
+    )
+
+    conn.commit()
+    conn.close()
+    
+def view_books():
+
+    conn = get_connection()
+
+    cursor = conn.cursor()
+
+    cursor.execute("""
+
+        SELECT *
+
+        FROM books
+
+        ORDER BY title
+
+    """)
+
+    books = cursor.fetchall()
+
+    conn.close()
+
+    return books
+
+def delete_book(title):
+
+    conn = get_connection()
 
     cursor = conn.cursor()
 
     cursor.execute(
 
-        """
+        "DELETE FROM books WHERE title=?",
 
-        INSERT INTO books(
-
-        title,
-
-        author,
-
-        isbn,
-
-        category,
-
-        status,
-
-        borrowed_by,
-
-        copies
-
-        )
-
-        VALUES(?,?,?,?,?,?,?)
-
-        """,
-
-        (
-
-            title,
-
-            author,
-
-            isbn,
-
-            category,
-
-            "Available",
-
-            "",
-
-            copies
-
-        )
+        (title,)
 
     )
 
@@ -116,40 +161,48 @@ def add_book(title, author, isbn, category, copies):
 
     conn.close()
 
-def view_books():
+def update_book(book_id, title, author, isbn, category, copies):
 
-    connection = sqlite3.connect("library.db")
+    conn = get_connection()
 
-    cursor = connection.cursor()
-
-    cursor.execute("SELECT * FROM books")
-
-    books = cursor.fetchall()
-
-    connection.close()
-
-    return books
-
-def delete_book(title):
-
-    connection = sqlite3.connect("library.db")
-
-    cursor = connection.cursor()
+    cursor = conn.cursor()
 
     cursor.execute(
-        "DELETE FROM books WHERE title=?",
-        (title,)
+        """
+        UPDATE books
+
+        SET
+
+        title=?,
+
+        author=?,
+
+        isbn=?,
+
+        category=?,
+
+        copies=?
+
+        WHERE id=?
+        """,
+
+        (
+            title,
+            author,
+            isbn,
+            category,
+            copies,
+            book_id
+        )
     )
 
-    connection.commit()
+    conn.commit()
 
-    connection.close()
+    conn.close()
     
 def available_books():
 
-    import sqlite3
-
-    conn = sqlite3.connect("library.db")
+    conn = get_connection()
 
     cursor = conn.cursor()
 
@@ -165,11 +218,10 @@ def available_books():
 
     return books
 
+
 def borrowed_books():
 
-    import sqlite3
-
-    conn = sqlite3.connect("library.db")
+    conn = get_connection()
 
     cursor = conn.cursor()
 
@@ -187,56 +239,29 @@ def borrowed_books():
 
 def update_status(title, status):
 
-    import sqlite3
-
-    conn = sqlite3.connect("library.db")
+    conn = get_connection()
 
     cursor = conn.cursor()
 
     cursor.execute(
-
-        "UPDATE books SET status=? WHERE title=?",
-
-        (status, title)
-        
+        """
+        UPDATE books
+        SET status=?
+        WHERE title=?
+        """,
+        (
+            status,
+            title
+        )
     )
 
     conn.commit()
 
     conn.close()
-    
-def create_member_table():
-
-    import sqlite3
-
-    conn = sqlite3.connect("library.db")
-
-    cursor = conn.cursor()
-
-    cursor.execute("""
-
-    CREATE TABLE IF NOT EXISTS members(
-
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-
-    name TEXT,
-
-    phone TEXT
-
-    )
-
-    """)
-
-    conn.commit()
-
-    conn.close()
-    
 
 def add_member(name, phone):
 
-    import sqlite3
-
-    conn = sqlite3.connect("library.db")
+    conn = get_connection()
 
     cursor = conn.cursor()
 
@@ -251,18 +276,17 @@ def add_member(name, phone):
     conn.commit()
 
     conn.close()
-    
+
+
 def view_members():
 
-    import sqlite3
-
-    conn = sqlite3.connect("library.db")
+    conn = get_connection()
 
     cursor = conn.cursor()
 
     cursor.execute(
 
-        "SELECT * FROM members"
+        "SELECT * FROM members ORDER BY name"
 
     )
 
@@ -272,11 +296,10 @@ def view_members():
 
     return members
 
+
 def search_member(keyword):
 
-    import sqlite3
-
-    conn = sqlite3.connect("library.db")
+    conn = get_connection()
 
     cursor = conn.cursor()
 
@@ -294,11 +317,10 @@ def search_member(keyword):
 
     return data
 
+
 def total_members():
 
-    import sqlite3
-
-    conn = sqlite3.connect("library.db")
+    conn = get_connection()
 
     cursor = conn.cursor()
 
@@ -308,25 +330,37 @@ def total_members():
 
     )
 
-    count = cursor.fetchone()[0]
+    total = cursor.fetchone()[0]
 
     conn.close()
 
-    return count
+    return total
 
-def borrow_book(title, member):
+def borrow_book(title, member, borrow_date, due_date):
 
-    import sqlite3
-
-    from datetime import datetime, timedelta
-
-    conn = sqlite3.connect("library.db")
-
+    conn = get_connection()
     cursor = conn.cursor()
 
-    borrow_date = datetime.now()
+    cursor.execute(
+        """
+        SELECT status,copies
+        FROM books
+        WHERE title=?
+        """,
+        (title,)
+    )
 
-    due_date = borrow_date + timedelta(days=14)
+    book = cursor.fetchone()
+
+    if book is None:
+
+        conn.close()
+        return False
+
+    if book[1] <= 0:
+
+        conn.close()
+        return False
 
     cursor.execute(
         """
@@ -335,145 +369,48 @@ def borrow_book(title, member):
             status=?,
             borrowed_by=?,
             borrow_date=?,
-            due_date=?
+            due_date=?,
+            copies=copies-1
         WHERE title=?
         """,
         (
             "Borrowed",
             member,
-            borrow_date.strftime("%Y-%m-%d"),
-            due_date.strftime("%Y-%m-%d"),
+            borrow_date,
+            due_date,
             title
         )
     )
 
-    conn.commit()
+    cursor.execute(
+        """
+        INSERT INTO transactions
+        (
+            book_title,
+            member_name,
+            borrow_date,
+            due_date,
+            return_date
+        )
+        VALUES(?,?,?,?,?)
+        """,
+        (
+            title,
+            member,
+            borrow_date,
+            due_date,
+            ""
+        )
+    )
 
+    conn.commit()
     conn.close()
-    
+
+    return True
+
 def return_book(title):
 
-    import sqlite3
-
-    conn = sqlite3.connect("library.db")
-
-    cursor = conn.cursor()
-
-    cursor.execute(
-        """
-        UPDATE books
-        SET
-            status=?,
-            borrowed_by='',
-            borrow_date='',
-            due_date=''
-        WHERE title=?
-        """,
-        (
-            "Available",
-            title
-        )
-    )
-
-    conn.commit()
-
-    conn.close()
-    
-def create_transaction_table():
-
-    import sqlite3
-
-    conn = sqlite3.connect("library.db")
-
-    cursor = conn.cursor()
-
-    cursor.execute("""
-
-    CREATE TABLE IF NOT EXISTS transactions(
-
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-
-        book_title TEXT,
-
-        member_name TEXT,
-
-        borrow_date TEXT,
-
-        due_date TEXT,
-
-        return_date TEXT
-
-    )
-
-    """)
-
-    conn.commit()
-
-    conn.close()
-    
-def return_book(title):
-
-    import sqlite3
-
-    from datetime import datetime
-
-    conn = sqlite3.connect("library.db")
-
-    cursor = conn.cursor()
-
-    cursor.execute(
-        """
-        UPDATE books
-        SET status=?,
-            borrowed_by=?
-        WHERE title=?
-        """,
-        (
-            "Available",
-            "",
-            title
-        )
-    )
-
-    cursor.execute(
-        """
-        UPDATE transactions
-        SET return_date=?
-        WHERE book_title=? AND return_date=''
-        """,
-        (
-            datetime.now().strftime("%Y-%m-%d"),
-            title
-        )
-    )
-
-    conn.commit()
-
-    conn.close()
-    
-def view_transactions(): 
-    
-    import sqlite3 
-    
-    conn = sqlite3.connect("library.db") 
-    
-    cursor = conn.cursor() 
-    
-    cursor.execute( "SELECT * FROM transactions" ) 
-    
-    data = cursor.fetchall() 
-    
-    conn.close() 
-    
-    return data
-    
-def overdue_books():
-
-    import sqlite3
-
-    from datetime import datetime
-
-    conn = sqlite3.connect("library.db")
+    conn = get_connection()
 
     cursor = conn.cursor()
 
@@ -481,12 +418,56 @@ def overdue_books():
 
     cursor.execute(
         """
-        SELECT *
-        FROM transactions
-        WHERE due_date<?
-        AND return_date=''
+        UPDATE books
+        SET
+            status='Available',
+            borrowed_by='',
+            borrow_date='',
+            due_date='',
+            copies=copies+1
+        WHERE title=?
         """,
-        (today,)
+        (title,)
+    )
+
+    cursor.execute(
+        """
+        UPDATE transactions
+        SET
+            return_date=?
+        WHERE
+            book_title=?
+        AND
+            return_date=''
+        """,
+        (
+            today,
+            title
+        )
+    )
+
+    conn.commit()
+
+    conn.close()
+    
+def view_transactions():
+
+    conn = get_connection()
+
+    cursor = conn.cursor()
+
+    cursor.execute(
+        """
+        SELECT
+            book_title,
+            member_name,
+            borrow_date,
+            due_date,
+            return_date
+        FROM transactions
+
+        ORDER BY borrow_date DESC
+        """
     )
 
     data = cursor.fetchall()
@@ -494,24 +475,61 @@ def overdue_books():
     conn.close()
 
     return data
+    
+def overdue_books():
 
-from datetime import datetime
-
-def calculate_fine():
-
-    import sqlite3
-
-    conn = sqlite3.connect("library.db")
+    conn = get_connection()
 
     cursor = conn.cursor()
 
-    cursor.execute("""
-        SELECT book_title,
-               member_name,
-               due_date
+    today = datetime.now().strftime("%Y-%m-%d")
+
+    cursor.execute(
+        """
+        SELECT
+            book_title,
+            member_name,
+            due_date
         FROM transactions
+
+        WHERE
+
+        due_date < ?
+
+        AND
+
+        return_date=''
+        """,
+        (today,)
+    )
+
+    books = cursor.fetchall()
+
+    conn.close()
+
+    return books
+
+def calculate_fine():
+
+    conn = get_connection()
+
+    cursor = conn.cursor()
+
+    cursor.execute(
+        """
+        SELECT
+
+        book_title,
+
+        member_name,
+
+        due_date
+
+        FROM transactions
+
         WHERE return_date=''
-    """)
+        """
+    )
 
     rows = cursor.fetchall()
 
@@ -523,21 +541,27 @@ def calculate_fine():
 
     for row in rows:
 
-        due = datetime.strptime(row[2], "%Y-%m-%d")
+        due = datetime.strptime(
+            row[2],
+            "%Y-%m-%d"
+        )
 
         if today > due:
 
-            overdue = (today - due).days
+            days = (today-due).days
 
-            fine = overdue * 10
+            fine = days*10
 
             fines.append(
 
                 (
 
                     row[0],
+
                     row[1],
-                    overdue,
+
+                    days,
+
                     fine
 
                 )
@@ -548,39 +572,33 @@ def calculate_fine():
 
 def dashboard():
 
-    import sqlite3
-
-    conn = sqlite3.connect("library.db")
+    conn = get_connection()
 
     cursor = conn.cursor()
 
     cursor.execute("SELECT COUNT(*) FROM books")
-
     total_books = cursor.fetchone()[0]
 
     cursor.execute(
-
         "SELECT COUNT(*) FROM books WHERE status='Available'"
-
     )
-
     available = cursor.fetchone()[0]
 
     cursor.execute(
-
         "SELECT COUNT(*) FROM books WHERE status='Borrowed'"
-
     )
-
     borrowed = cursor.fetchone()[0]
 
     cursor.execute(
-
         "SELECT COUNT(*) FROM members"
+    )
+    members = cursor.fetchone()[0]
 
+    cursor.execute(
+        "SELECT SUM(copies) FROM books"
     )
 
-    members = cursor.fetchone()[0]
+    stock = cursor.fetchone()[0]
 
     conn.close()
 
@@ -592,15 +610,15 @@ def dashboard():
 
         borrowed,
 
-        members
+        members,
+
+        stock
 
     )
     
 def most_borrowed():
 
-    import sqlite3
-
-    conn = sqlite3.connect("library.db")
+    conn = get_connection()
 
     cursor = conn.cursor()
 
@@ -610,39 +628,41 @@ def most_borrowed():
 
         book_title,
 
-        COUNT(*)
+        COUNT(*) AS total
 
     FROM transactions
 
     GROUP BY book_title
 
-    ORDER BY COUNT(*) DESC
+    ORDER BY total DESC
 
-    LIMIT 5
+    LIMIT 10
 
     """)
 
-    data = cursor.fetchall()
+    books = cursor.fetchall()
 
     conn.close()
 
-    return data
+    return books
 
 import csv
 
 def export_transactions():
 
-    import sqlite3
-
-    conn = sqlite3.connect("library.db")
+    conn = get_connection()
 
     cursor = conn.cursor()
 
-    cursor.execute(
+    cursor.execute("""
 
-        "SELECT * FROM transactions"
+    SELECT *
 
-    )
+    FROM transactions
+
+    ORDER BY borrow_date DESC
+
+    """)
 
     rows = cursor.fetchall()
 
@@ -654,7 +674,9 @@ def export_transactions():
 
         "w",
 
-        newline=""
+        newline="",
+
+        encoding="utf-8"
 
     ) as file:
 
@@ -682,72 +704,30 @@ def export_transactions():
 
         writer.writerows(rows)
         
-def create_reservation_table():
-
-    import sqlite3
-
-    conn = sqlite3.connect("library.db")
-
-    cursor = conn.cursor()
-
-    cursor.execute("""
-
-    CREATE TABLE IF NOT EXISTS reservations(
-
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-
-    member_name TEXT,
-
-    book_title TEXT,
-
-    reservation_date TEXT
-
-    )
-
-    """)
-
-    conn.commit()
-
-    conn.close()
-    
-from datetime import datetime
-
 def reserve_book(member, book):
 
-    import sqlite3
-
-    conn = sqlite3.connect("library.db")
+    conn = get_connection()
 
     cursor = conn.cursor()
 
+    today = datetime.now().strftime("%Y-%m-%d")
+
     cursor.execute(
-
         """
-
-        INSERT INTO reservations(
-
-        member_name,
-
-        book_title,
-
-        reservation_date
-
+        INSERT INTO reservations
+        (
+            member_name,
+            book_title,
+            reservation_date
         )
 
         VALUES(?,?,?)
-
         """,
-
         (
-
             member,
-
             book,
-
-            datetime.now().strftime("%Y-%m-%d")
-
+            today
         )
-
     )
 
     conn.commit()
@@ -756,16 +736,18 @@ def reserve_book(member, book):
     
 def view_reservations():
 
-    import sqlite3
-
-    conn = sqlite3.connect("library.db")
+    conn = get_connection()
 
     cursor = conn.cursor()
 
     cursor.execute(
+        """
+        SELECT *
 
-        "SELECT * FROM reservations"
+        FROM reservations
 
+        ORDER BY reservation_date DESC
+        """
     )
 
     data = cursor.fetchall()
@@ -810,31 +792,33 @@ def restock_book(title, qty):
     
 def low_stock():
 
-    import sqlite3
-
-    conn = sqlite3.connect("library.db")
+    conn = get_connection()
 
     cursor = conn.cursor()
 
-    cursor.execute(
+    cursor.execute("""
 
-        """
+    SELECT
 
-        SELECT *
+        title,
 
-        FROM books
+        author,
 
-        WHERE copies<=2
+        copies
 
-        """
+    FROM books
 
-    )
+    WHERE copies<=2
 
-    data = cursor.fetchall()
+    ORDER BY copies ASC
+
+    """)
+
+    books = cursor.fetchall()
 
     conn.close()
 
-    return data
+    return books
 
 def update_book(book_id, title, author, category, copies):
 
@@ -889,93 +873,72 @@ def delete_book_by_id(book_id):
     
 def search_books(keyword):
 
-    import sqlite3
-
-    conn = sqlite3.connect("library.db")
+    conn = get_connection()
 
     cursor = conn.cursor()
 
     cursor.execute(
-
         """
-
         SELECT *
 
         FROM books
 
         WHERE title LIKE ?
-
         """,
-
         ("%"+keyword+"%",)
-
     )
 
-    data = cursor.fetchall()
+    books = cursor.fetchall()
 
     conn.close()
 
-    return data
+    return books
 
 def search_author(author):
 
-    import sqlite3
-
-    conn = sqlite3.connect("library.db")
+    conn = get_connection()
 
     cursor = conn.cursor()
 
     cursor.execute(
-
         """
-
         SELECT *
 
         FROM books
 
         WHERE author LIKE ?
-
         """,
-
         ("%"+author+"%",)
-
     )
 
-    data = cursor.fetchall()
+    books = cursor.fetchall()
 
     conn.close()
 
-    return data
+    return books
 
 def search_category(category):
 
-    import sqlite3
-
-    conn = sqlite3.connect("library.db")
+    conn = get_connection()
 
     cursor = conn.cursor()
 
     cursor.execute(
-
         """
-
         SELECT *
 
         FROM books
 
         WHERE category LIKE ?
-
         """,
-
         ("%"+category+"%",)
-
     )
 
-    data = cursor.fetchall()
+    books = cursor.fetchall()
 
     conn.close()
 
-    return data
+    return books
 
 def available_books():
 
@@ -1032,39 +995,6 @@ def borrowed_books():
     conn.close()
 
     return data
-
-def dashboard_data():
-
-    import sqlite3
-
-    conn = sqlite3.connect("library.db")
-
-    cursor = conn.cursor()
-
-    cursor.execute("SELECT COUNT(*) FROM books")
-    total_books = cursor.fetchone()[0]
-
-    cursor.execute("SELECT COUNT(*) FROM members")
-    total_members = cursor.fetchone()[0]
-
-    cursor.execute(
-        "SELECT COUNT(*) FROM books WHERE status='Available'"
-    )
-    available = cursor.fetchone()[0]
-
-    cursor.execute(
-        "SELECT COUNT(*) FROM books WHERE status='Borrowed'"
-    )
-    borrowed = cursor.fetchone()[0]
-
-    conn.close()
-
-    return (
-        total_books,
-        total_members,
-        available,
-        borrowed
-    )
 
 def calculate_fine(due_date):
 
@@ -1124,19 +1054,28 @@ def overdue_books():
 
 def add_review(book_title, member_name, rating, review):
 
-    import sqlite3
-
-    conn = sqlite3.connect("library.db")
+    conn = get_connection()
 
     cursor = conn.cursor()
 
     cursor.execute(
         """
         INSERT INTO reviews
-        (book_title, member_name, rating, review)
+        (
+            book_title,
+            member_name,
+            rating,
+            review
+        )
+
         VALUES(?,?,?,?)
         """,
-        (book_title, member_name, rating, review)
+        (
+            book_title,
+            member_name,
+            rating,
+            review
+        )
     )
 
     conn.commit()
@@ -1145,19 +1084,25 @@ def add_review(book_title, member_name, rating, review):
     
 def view_reviews(book_title):
 
-    import sqlite3
-
-    conn = sqlite3.connect("library.db")
+    conn = get_connection()
 
     cursor = conn.cursor()
 
     cursor.execute(
         """
-        SELECT member_name,
-               rating,
-               review
+        SELECT
+
+        member_name,
+
+        rating,
+
+        review
+
         FROM reviews
+
         WHERE book_title=?
+
+        ORDER BY rating DESC
         """,
         (book_title,)
     )
@@ -1170,49 +1115,50 @@ def view_reviews(book_title):
 
 def search_isbn(isbn):
 
-    import sqlite3
-
-    conn=sqlite3.connect("library.db")
-
-    cursor=conn.cursor()
-
-    cursor.execute(
-
-        "SELECT * FROM books WHERE isbn=?",
-
-        (isbn,)
-
-    )
-
-    data=cursor.fetchall()
-
-    conn.close()
-
-    return data
-
-from datetime import datetime
-
-def join_waitlist(book_title, member_name):
-
-    import sqlite3
-
-    conn = sqlite3.connect("library.db")
+    conn = get_connection()
 
     cursor = conn.cursor()
 
     cursor.execute(
         """
-        INSERT INTO waitlist(
-        book_title,
-        member_name,
-        request_date
+        SELECT *
+
+        FROM books
+
+        WHERE isbn=?
+        """,
+        (isbn,)
+    )
+
+    books = cursor.fetchall()
+
+    conn.close()
+
+    return books
+
+def join_waitlist(book_title, member_name):
+
+    conn = get_connection()
+
+    cursor = conn.cursor()
+
+    today = datetime.now().strftime("%Y-%m-%d")
+
+    cursor.execute(
+        """
+        INSERT INTO waitlist
+        (
+            book_title,
+            member_name,
+            request_date
         )
+
         VALUES(?,?,?)
         """,
         (
             book_title,
             member_name,
-            datetime.now().strftime("%Y-%m-%d")
+            today
         )
     )
 
@@ -1222,18 +1168,22 @@ def join_waitlist(book_title, member_name):
     
 def view_waitlist(book_title):
 
-    import sqlite3
-
-    conn = sqlite3.connect("library.db")
+    conn = get_connection()
 
     cursor = conn.cursor()
 
     cursor.execute(
         """
-        SELECT member_name,
-               request_date
+        SELECT
+
+        member_name,
+
+        request_date
+
         FROM waitlist
+
         WHERE book_title=?
+
         ORDER BY id
         """,
         (book_title,)
@@ -1244,7 +1194,204 @@ def view_waitlist(book_title):
     conn.close()
 
     return data
+
+def next_waiting_member(book_title):
+
+    conn = get_connection()
+
+    cursor = conn.cursor()
+
+    cursor.execute(
+        """
+        SELECT
+
+        id,
+
+        member_name
+
+        FROM waitlist
+
+        WHERE book_title=?
+
+        ORDER BY id
+
+        LIMIT 1
+        """,
+        (book_title,)
+    )
+
+    person = cursor.fetchone()
+
+    conn.close()
+
+    return person
     
-create_reservation_table()
-create_member_table()
-create_transaction_table()
+def remove_from_waitlist(wait_id):
+
+    conn = get_connection()
+
+    cursor = conn.cursor()
+
+    cursor.execute(
+        "DELETE FROM waitlist WHERE id=?",
+        (wait_id,)
+    )
+
+    conn.commit()
+
+    conn.close()
+    
+def average_rating(book_title):
+
+    conn = get_connection()
+
+    cursor = conn.cursor()
+
+    cursor.execute(
+        """
+        SELECT AVG(rating)
+
+        FROM reviews
+
+        WHERE book_title=?
+        """,
+        (book_title,)
+    )
+
+    rating = cursor.fetchone()[0]
+
+    conn.close()
+
+    return rating
+
+def top_rated_books():
+
+    conn = get_connection()
+
+    cursor = conn.cursor()
+
+    cursor.execute("""
+
+    SELECT
+
+        book_title,
+
+        ROUND(AVG(rating),2)
+
+    FROM reviews
+
+    GROUP BY book_title
+
+    ORDER BY AVG(rating) DESC
+
+    LIMIT 10
+
+    """)
+
+    books = cursor.fetchall()
+
+    conn.close()
+
+    return books
+
+def category_statistics():
+
+    conn = get_connection()
+
+    cursor = conn.cursor()
+
+    cursor.execute("""
+
+    SELECT
+
+        category,
+
+        COUNT(*)
+
+    FROM books
+
+    GROUP BY category
+
+    ORDER BY COUNT(*) DESC
+
+    """)
+
+    data = cursor.fetchall()
+
+    conn.close()
+
+    return data
+
+def is_book_available(title):
+
+    conn = get_connection()
+
+    cursor = conn.cursor()
+
+    cursor.execute(
+
+        """
+
+        SELECT copies
+
+        FROM books
+
+        WHERE title=?
+
+        """,
+
+        (title,)
+
+    )
+
+    result = cursor.fetchone()
+
+    conn.close()
+
+    if result is None:
+
+        return False
+
+    return result[0] > 0
+
+def total_fine_collection():
+
+    fines = calculate_fine()
+
+    total = 0
+
+    for item in fines:
+
+        total += item[3]
+
+    return total
+
+def recent_borrows():
+
+    conn = get_connection()
+
+    cursor = conn.cursor()
+
+    cursor.execute("""
+
+    SELECT
+
+        book_title,
+
+        member_name,
+
+        borrow_date
+
+    FROM transactions
+
+    ORDER BY id DESC
+
+    LIMIT 10
+
+    """)
+
+    data = cursor.fetchall()
+
+    conn.close()
+
+    return data

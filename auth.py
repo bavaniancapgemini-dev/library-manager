@@ -42,7 +42,6 @@ def register(username,password,role):
 
     conn.close()
 
-    
 def login(username,password):
 
     conn=sqlite3.connect("users.db")

@@ -25,7 +25,9 @@ from database import (
     view_reviews,
     search_isbn,
     join_waitlist,
-    view_waitlist
+    view_waitlist,
+    next_waiting_member,
+    remove_from_waitlist
 )
 
 from search import search_book
@@ -258,18 +260,26 @@ while True:
 
         due_date = (datetime.now() + timedelta(days=14)).strftime("%Y-%m-%d")
 
-        borrow_book(
+        success = borrow_book(
             title_name,
             member,
             borrow_date,
             due_date
         )
 
-        print("Book Borrowed")
+        if success:
 
-        print("Due Date:", due_date)
+            print("Book Borrowed Successfully")
 
-        print("Book Borrowed")
+        else:
+
+            print("Book Not Available")
+
+            print("Book Borrowed")
+
+            print("Due Date:", due_date)
+
+            print("Book Borrowed")
         
     elif choice == "12":
 
@@ -277,7 +287,36 @@ while True:
 
         return_book(title_name)
 
-        print("Book Returned")
+        print("Book Returned Successfully")
+
+        next_member = next_waiting_member(title_name)
+
+        if next_member:
+
+            wait_id = next_member[0]
+
+            member = next_member[1]
+
+            borrow_book(
+                title_name,
+                member,
+                "",
+                ""
+            )
+
+            remove_from_waitlist(wait_id)
+
+            print()
+
+            print("================================")
+
+            print("BOOK AUTOMATICALLY ASSIGNED")
+
+            print("Member :", member)
+
+            print("Book :", title_name)
+
+            print("================================")
         
     elif choice == "13":
 
@@ -365,6 +404,8 @@ while True:
         print("Borrowed    :", stats[2])
 
         print("Members     :", stats[3])
+        
+        print("Stock       :", stats[4])
 
         print("\nMost Borrowed Books\n")
 
