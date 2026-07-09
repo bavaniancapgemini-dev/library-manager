@@ -22,7 +22,8 @@ from database import (
     restock_book,
     low_stock,
     add_review,
-    view_reviews
+    view_reviews,
+    search_isbn
 )
 
 from search import search_book
@@ -81,7 +82,8 @@ while True:
     print("25. Library Analytics")
     print("26. Add Review")
     print("27. View Reviews")
-    print("28. Exit")
+    print("28. Search By ISBN")
+    print("29. Exit")
 
     choice = input("Choose: ")
 
@@ -91,6 +93,8 @@ while True:
         title_name = input("Book Title: ")
 
         author = input("Author: ")
+        
+        isbn=input("ISBN Number: ")
 
         category = input("Category: ")
 
@@ -98,9 +102,11 @@ while True:
 
         add_book(
 
-            title,
+            title_name,
 
             author,
+            
+            isbn,
 
             category,
 
@@ -124,10 +130,12 @@ while True:
             print("Title   :", book[1])
 
             print("Author  :", book[2])
+            
+            print("ISBN :",book[3])
 
-            print("Category:", book[3])
+            print("Category:", book[4])
 
-            print("Status  :", book[4])
+            print("Status  :", book[5])
 
             print("-"*40)
 
@@ -397,13 +405,13 @@ while True:
             
         else:
 
-            title=input("Book Title: ")
+            title_name = input("Book Title: ")
 
             qty=int(input("Copies To Add: "))
 
             restock_book(
 
-                title,
+                title_name,
 
                 qty
 
@@ -495,8 +503,18 @@ while True:
             print("Review :", item[2])
 
             print("-" * 40)
+            
+    elif choice=="28":
+
+        isbn=input("Enter ISBN: ")
+
+        books=search_isbn(isbn)
+
+        for book in books:
+
+            print(book)
         
-    elif choice == "28":
+    elif choice == "29":
 
         break
 

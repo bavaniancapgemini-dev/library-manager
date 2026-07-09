@@ -14,6 +14,8 @@ title TEXT,
 
 author TEXT,
 
+isbn TEXT UNIQUE,
+
 category TEXT,
 
 status TEXT,
@@ -45,7 +47,7 @@ connection.commit()
 
 connection.close()
 
-def add_book(title, author, category, copies):
+def add_book(title, author, isbn, category, copies):
 
     import sqlite3
 
@@ -63,17 +65,19 @@ def add_book(title, author, category, copies):
 
         author,
 
+        isbn,
+
         category,
 
         status,
 
         borrowed_by,
 
-        copies,
+        copies
 
         )
 
-        VALUES(?,?,?,?,?,?)
+        VALUES(?,?,?,?,?,?,?)
 
         """,
 
@@ -83,13 +87,15 @@ def add_book(title, author, category, copies):
 
             author,
 
+            isbn,
+
             category,
 
             "Available",
 
             "",
 
-            copies,
+            copies
 
         )
 
@@ -98,7 +104,7 @@ def add_book(title, author, category, copies):
     conn.commit()
 
     conn.close()
-    
+
 def view_books():
 
     connection = sqlite3.connect("library.db")
@@ -1146,6 +1152,28 @@ def view_reviews(book_title):
     )
 
     data = cursor.fetchall()
+
+    conn.close()
+
+    return data
+
+def search_isbn(isbn):
+
+    import sqlite3
+
+    conn=sqlite3.connect("library.db")
+
+    cursor=conn.cursor()
+
+    cursor.execute(
+
+        "SELECT * FROM books WHERE isbn=?",
+
+        (isbn,)
+
+    )
+
+    data=cursor.fetchall()
 
     conn.close()
 
