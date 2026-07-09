@@ -2,6 +2,7 @@ import tkinter as tk
 from tkinter import messagebox
 from tkinter import filedialog
 from database import add_book
+from cover_manager import upload_cover
 
 
 class AddBookGUI:
@@ -37,6 +38,16 @@ class AddBookGUI:
         tk.Label(self.window, text="Copies").pack(pady=5)
         self.copies_entry = tk.Entry(self.window, width=40)
         self.copies_entry.pack()
+        
+        tk.Button(
+
+            self.window,
+
+            text="Upload Cover",
+
+            command=self.select_cover
+
+        ).grid(row=6, column=1, pady=10)
 
         tk.Button(
             self.window,
@@ -100,3 +111,11 @@ class AddBookGUI:
         if filename:
 
             self.cover_path = filename
+            
+    def select_cover(self):
+
+        self.cover_path = upload_cover()
+
+        if self.cover_path:
+
+            print("Cover Selected:", self.cover_path)
