@@ -7,6 +7,9 @@ from reports import export_members
 from theme import *
 import tkinter as tk
 from tkinter import ttk
+from login import LoginWindow
+
+LoginWindow()
 
 root = tk.Tk()
 
