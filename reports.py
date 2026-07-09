@@ -103,3 +103,21 @@ def export_members():
     )
 
     conn.close()
+    
+def total_books():
+
+    conn = sqlite3.connect("library.db")
+
+    cursor = conn.cursor()
+
+    cursor.execute(
+
+        "SELECT COUNT(*) FROM books"
+
+    )
+
+    total = cursor.fetchone()[0]
+
+    conn.close()
+
+    return total

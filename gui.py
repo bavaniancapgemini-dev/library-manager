@@ -550,7 +550,6 @@ tk.Label(
 
 ).pack(pady=10)
 
-
 add_btn = tk.Button(
 
     root,

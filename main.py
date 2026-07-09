@@ -20,13 +20,16 @@ from database import (
     reserve_book,
     view_reservations,
     restock_book,
-    low_stock
+    low_stock,
+    add_review,
+    view_reviews
 )
 
 from search import search_book
 from reports import total_books
 from utils import title
 from auth import login, register
+from analytics import library_statistics
 
 print("===== LIBRARY LOGIN =====")
 
@@ -75,7 +78,10 @@ while True:
     print("22. Restock Books")
     print("23. Low Stock Report")
     print("24. Add Librarian")
-    print("25. Exit")
+    print("25. Library Analytics")
+    print("26. Add Review")
+    print("27. View Reviews")
+    print("28. Exit")
 
     choice = input("Choose: ")
 
@@ -438,8 +444,59 @@ while True:
             )
 
             print("Librarian Added Successfully")
-        
+            
     elif choice == "25":
+
+        stats = library_statistics()
+
+        print("\n===== LIBRARY ANALYTICS =====\n")
+
+        print("📚 Total Books      :", stats[0])
+
+        print("👥 Total Members    :", stats[1])
+
+        print("✅ Available Books  :", stats[2])
+
+        print("📖 Borrowed Books   :", stats[3])
+        
+    elif choice == "26":
+
+        book = input("Book Title: ")
+
+        member = input("Member Name: ")
+
+        rating = int(input("Rating (1-5): "))
+
+        review = input("Review: ")
+
+        add_review(
+            book,
+            member,
+            rating,
+            review
+        )
+
+        print("Review Added Successfully")
+        
+    elif choice == "27":
+
+        book = input("Book Title: ")
+
+        reviews = view_reviews(book)
+
+        print("\n===== BOOK REVIEWS =====\n")
+
+        for item in reviews:
+
+            print("Member :", item[0])
+
+            print("Rating :", item[1])
+
+            print("Review :", item[2])
+
+            print("-" * 40)
+        
+    elif choice == "28":
 
         break
 

@@ -29,6 +29,18 @@ copies INTEGER
 )
 """)
 
+cursor.execute("""
+CREATE TABLE IF NOT EXISTS reviews(
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    book_title TEXT,
+    member_name TEXT,
+    rating INTEGER,
+    review TEXT
+)
+""")
+
+connection.commit()
+
 connection.commit()
 
 connection.close()
@@ -57,7 +69,7 @@ def add_book(title, author, category, copies):
 
         borrowed_by,
 
-        copies
+        copies,
 
         )
 
@@ -77,7 +89,7 @@ def add_book(title, author, category, copies):
 
             "",
 
-            copies
+            copies,
 
         )
 
@@ -169,7 +181,7 @@ def update_status(title, status):
         "UPDATE books SET status=? WHERE title=?",
 
         (status, title)
-
+        
     )
 
     conn.commit()
@@ -1092,6 +1104,52 @@ def overdue_books():
     conn.close()
 
     return overdue
+
+def add_review(book_title, member_name, rating, review):
+
+    import sqlite3
+
+    conn = sqlite3.connect("library.db")
+
+    cursor = conn.cursor()
+
+    cursor.execute(
+        """
+        INSERT INTO reviews
+        (book_title, member_name, rating, review)
+        VALUES(?,?,?,?)
+        """,
+        (book_title, member_name, rating, review)
+    )
+
+    conn.commit()
+
+    conn.close()
+    
+def view_reviews(book_title):
+
+    import sqlite3
+
+    conn = sqlite3.connect("library.db")
+
+    cursor = conn.cursor()
+
+    cursor.execute(
+        """
+        SELECT member_name,
+               rating,
+               review
+        FROM reviews
+        WHERE book_title=?
+        """,
+        (book_title,)
+    )
+
+    data = cursor.fetchall()
+
+    conn.close()
+
+    return data
 
 create_reservation_table()
 create_member_table()
