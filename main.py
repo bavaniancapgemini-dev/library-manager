@@ -35,6 +35,10 @@ from reports import total_books
 from utils import title
 from auth import login, register
 from analytics import library_statistics
+from recommendation import recommend_books
+from statistics import monthly_borrows
+from activity import active_members
+from reminder import due_today
 
 print("===== LIBRARY LOGIN =====")
 
@@ -53,6 +57,16 @@ if not user:
 role = user[0]
 
 print("Welcome", role)
+
+due = due_today()
+
+if due:
+
+    print("\n📢 BOOKS DUE TODAY")
+
+    for item in due:
+
+        print(item)
 
 
 while True:
@@ -89,7 +103,10 @@ while True:
     print("28. Search By ISBN")
     print("29. Join Waitlist")
     print("30. View Waitlist")
-    print("31. Exit")
+    print("31. Recommend Books")
+    print("32. Monthly Borrow Report")
+    print("33. Most Active Members")
+    print("34. Exit")
 
     choice = input("Choose: ")
 
@@ -589,8 +606,46 @@ while True:
             print("Requested :", member[1])
 
             print("-"*40)
-        
+            
     elif choice == "31":
+
+        category = input("Favorite Category: ")
+
+        books = recommend_books(category)
+
+        print("\n===== RECOMMENDED BOOKS =====\n")
+
+        if books:
+
+            for book in books:
+
+                print(book)
+
+        else:
+
+            print("No Recommendations")
+            
+    elif choice == "32":
+
+        report = monthly_borrows()
+
+        print("\n===== MONTHLY REPORT =====")
+
+        for month,total in report:
+
+            print(month,"->",total)
+            
+    elif choice == "33":
+
+        members = active_members()
+
+        print("\n===== MOST ACTIVE MEMBERS =====")
+
+        for member in members:
+
+            print(member)
+        
+    elif choice == "34":
 
         break
 
