@@ -163,29 +163,23 @@ def delete_book(title):
 
 def update_book(book_id, title, author, isbn, category, copies):
 
-    conn = get_connection()
+    import sqlite3
+
+    conn = sqlite3.connect("library.db")
 
     cursor = conn.cursor()
 
     cursor.execute(
         """
         UPDATE books
-
         SET
-
-        title=?,
-
-        author=?,
-
-        isbn=?,
-
-        category=?,
-
-        copies=?
-
+            title=?,
+            author=?,
+            isbn=?,
+            category=?,
+            copies=?
         WHERE id=?
         """,
-
         (
             title,
             author,

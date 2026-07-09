@@ -1,7 +1,7 @@
 import tkinter as tk
 from tkinter import ttk
 from add_book_gui import AddBookGUI
-
+from edit_book_gui import EditBookGUI
 from database import view_books
 
 
@@ -109,15 +109,12 @@ class BooksGUI:
         ).grid(row=0,column=0,padx=5)
 
         tk.Button(
-
             bottom,
-
             text="Edit Book",
-
-            width=15
-
+            width=15,
+            command=self.edit_selected
         ).grid(row=0,column=1,padx=5)
-
+        
         tk.Button(
 
             bottom,
@@ -175,3 +172,25 @@ class BooksGUI:
                 )
 
             )
+            
+    def edit_selected(self):
+
+        selected = self.tree.focus()
+
+        if not selected:
+            return
+
+        values = self.tree.item(selected)["values"]
+
+        books = view_books()
+
+        for book in books:
+
+            if book[0] == values[0]:
+
+                EditBookGUI(
+                    book,
+                    self.load_books
+                )
+
+            break
