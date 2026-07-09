@@ -41,6 +41,17 @@ CREATE TABLE IF NOT EXISTS reviews(
 )
 """)
 
+cursor.execute("""
+CREATE TABLE IF NOT EXISTS waitlist(
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    book_title TEXT,
+    member_name TEXT,
+    request_date TEXT
+)
+""")
+
+connection.commit()
+
 connection.commit()
 
 connection.commit()
@@ -1179,6 +1190,61 @@ def search_isbn(isbn):
 
     return data
 
+from datetime import datetime
+
+def join_waitlist(book_title, member_name):
+
+    import sqlite3
+
+    conn = sqlite3.connect("library.db")
+
+    cursor = conn.cursor()
+
+    cursor.execute(
+        """
+        INSERT INTO waitlist(
+        book_title,
+        member_name,
+        request_date
+        )
+        VALUES(?,?,?)
+        """,
+        (
+            book_title,
+            member_name,
+            datetime.now().strftime("%Y-%m-%d")
+        )
+    )
+
+    conn.commit()
+
+    conn.close()
+    
+def view_waitlist(book_title):
+
+    import sqlite3
+
+    conn = sqlite3.connect("library.db")
+
+    cursor = conn.cursor()
+
+    cursor.execute(
+        """
+        SELECT member_name,
+               request_date
+        FROM waitlist
+        WHERE book_title=?
+        ORDER BY id
+        """,
+        (book_title,)
+    )
+
+    data = cursor.fetchall()
+
+    conn.close()
+
+    return data
+    
 create_reservation_table()
 create_member_table()
 create_transaction_table()

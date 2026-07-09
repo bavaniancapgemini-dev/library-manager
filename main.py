@@ -23,7 +23,9 @@ from database import (
     low_stock,
     add_review,
     view_reviews,
-    search_isbn
+    search_isbn,
+    join_waitlist,
+    view_waitlist
 )
 
 from search import search_book
@@ -83,7 +85,9 @@ while True:
     print("26. Add Review")
     print("27. View Reviews")
     print("28. Search By ISBN")
-    print("29. Exit")
+    print("29. Join Waitlist")
+    print("30. View Waitlist")
+    print("31. Exit")
 
     choice = input("Choose: ")
 
@@ -513,8 +517,39 @@ while True:
         for book in books:
 
             print(book)
-        
+            
     elif choice == "29":
+
+        book = input("Book Title: ")
+
+        member = input("Member Name: ")
+
+        join_waitlist(
+            book,
+            member
+        )
+
+        print("Added to Waiting List Successfully")
+    
+    elif choice == "30":
+
+        book = input("Book Title: ")
+
+        members = view_waitlist(book)
+
+        print("\n===== WAITING LIST =====\n")
+
+        for i, member in enumerate(members, start=1):
+
+            print(i)
+
+            print("Member :", member[0])
+
+            print("Requested :", member[1])
+
+            print("-"*40)
+        
+    elif choice == "31":
 
         break
 
